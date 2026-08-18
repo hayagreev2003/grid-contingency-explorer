@@ -4,8 +4,8 @@ Take a transmission line out of service and watch which Indian cities can no
 longer be supplied to their peak demand — and which fuels they lose access to.
 
 **FastAPI** backend on the official `neo4j` Python driver, talking to **CognoDB**
-over Bolt. **Next.js** front end, shipped as a static export that FastAPI serves
-itself — one process, one origin, one URL.
+over Bolt. **Next.js** front end, shipped as a static export. Deployed as two
+services: the frontend on **Vercel**, the API on **Render**.
 
 ![The explorer with the Mundra–Mohindergarh HVDC bipole tripped](docs/screenshot-tripped.png)
 
@@ -326,18 +326,99 @@ Neo4j found **12 of 230** single-line outages produce a shortfall.
 
 ## Deployment
 
-Any host that runs a Python process works — Render, Railway and Fly.io all have a
-free tier that does.
+The frontend is a static export on **Vercel**; the API is a Python service on
+**Render**. They are separate origins, which makes two things load-bearing: the
+CORS allow-list on the API, and the fact that the API URL is compiled into the
+frontend bundle at build time.
+
+### 1. Seed the database first
+
+Seeding runs from your machine against the CognoDB instance — the deployed API
+only ever reads. Do this before either deploy, or the app will come up empty.
 
 ```bash
-cd frontend && npm ci && npm run build      # build step
-cd backend  && pip install -r requirements.txt
-uvicorn app.main:app --host 0.0.0.0 --port $PORT   # start command
+cd backend && .venv/bin/python -m scripts.seed --reset
 ```
 
-Set `COGNODB_URI`, `COGNODB_USER` and `COGNODB_PASSWORD` in the host's
-environment. Keep `COGNODB_MAX_POOL_SIZE` modest: the free `c0` instance allows
-200 connections in total.
+### 2. Backend on Render
+
+The repository contains [`render.yaml`](render.yaml), so a Blueprint deploy picks
+everything up. Manually, the settings are:
+
+| Setting | Value |
+|---|---|
+| Root directory | `backend` |
+| Build command | `pip install -r requirements.txt` |
+| Start command | `uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
+| Health check path | `/api/health` |
+
+Environment variables to set in the Render dashboard:
+
+```
+COGNODB_URI          bolt+s://<instance-id>.databases.cognodb.com
+COGNODB_USER         cognodb
+COGNODB_PASSWORD     <your password>
+COGNODB_MAX_POOL_SIZE 5
+PYTHON_VERSION       3.12.7
+CORS_ORIGINS         https://<your-project>.vercel.app
+CORS_ORIGIN_REGEX    ^https://[a-z0-9-]+\.vercel\.app$
+```
+
+`CORS_ORIGINS` is the production Vercel domain. `CORS_ORIGIN_REGEX` additionally
+admits Vercel preview deployments, whose hostname changes on every push, without
+opening the API to everyone. There is no wildcard anywhere: this API is public
+and unauthenticated, so the allow-list is the only statement of who may call it.
+
+Note the ordering problem — Render needs the Vercel domain and Vercel needs the
+Render URL. Deploy Render first, take its URL, deploy Vercel, then come back and
+set `CORS_ORIGINS`. The second Render deploy is just an environment change.
+
+### 3. Frontend on Vercel
+
+| Setting | Value |
+|---|---|
+| Root directory | `frontend` |
+| Framework preset | Next.js (detected) |
+| Environment variable | `NEXT_PUBLIC_API_BASE=https://<your-service>.onrender.com` |
+
+**`NEXT_PUBLIC_API_BASE` is baked in at build time.** This is a static export, so
+the value is compiled into the JavaScript bundle. Changing it in the Vercel
+dashboard does nothing until you redeploy — if the API moves, rebuild the
+frontend.
+
+### 4. Verify the pair
+
+```bash
+curl https://<service>.onrender.com/api/health
+curl -I -H "Origin: https://<project>.vercel.app" \
+     https://<service>.onrender.com/api/health   # expect access-control-allow-origin
+```
+
+### The free-tier cold start, and what is done about it
+
+Render suspends a free web service after about 15 minutes of inactivity, and the
+next request then waits roughly a minute while it starts again. For a demo link
+that someone clicks without warning, that reads as broken.
+
+Two things address it:
+
+- The UI says so. If the first load takes more than five seconds, the map panel
+  explains that the backend is waking and that later requests are fast, instead
+  of showing an unexplained skeleton.
+- [`.github/workflows/keep-warm.yml`](.github/workflows/keep-warm.yml) pings
+  `/api/health` every ten minutes so the service stays resident. Set the
+  `API_URL` repository variable to enable it.
+
+### Running it as a single service instead
+
+The split above is not required. `app.main` serves the built frontend from
+`frontend/out` whenever that directory exists, so building the frontend and
+running uvicorn gives one process on one origin, with CORS irrelevant:
+
+```bash
+cd frontend && npm run build
+cd ../backend && .venv/bin/uvicorn app.main:app --port 8000
+```
 
 ## One more portability note
 

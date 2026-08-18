@@ -1,0 +1,41 @@
+# Render Blueprint for the FastAPI backend.
+#
+# The frontend is deployed separately to Vercel, so this service is API-only:
+# app.main skips its static mount when frontend/out is absent.
+#
+# After the first deploy, set CORS_ORIGINS to the Vercel production domain.
+services:
+  - type: web
+    name: grid-contingency-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+
+      # Connection details. Set these in the Render dashboard, never here.
+      - key: COGNODB_URI
+        sync: false
+      - key: COGNODB_USER
+        sync: false
+      - key: COGNODB_PASSWORD
+        sync: false
+
+      # The free CognoDB instance allows 200 connections in total. Render's free
+      # plan runs a single instance, so a small pool is plenty.
+      - key: COGNODB_MAX_POOL_SIZE
+        value: "5"
+
+      # Exact origins allowed to call this API. Replace with the real Vercel
+      # domain once it exists.
+      - key: CORS_ORIGINS
+        sync: false
+
+      # Vercel preview deployments get a new hostname on every push. This lets
+      # them through without opening the API to everyone.
+      - key: CORS_ORIGIN_REGEX
+        value: ^https://[a-z0-9-]+\.vercel\.app$

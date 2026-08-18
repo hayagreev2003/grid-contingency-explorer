@@ -36,6 +36,10 @@ export default function Home() {
   const [mix, setMix] = useState<{ mix: FuelMixRow[]; renewable_pct: number } | null>(null)
 
   const [loadingBase, setLoadingBase] = useState(true)
+  // Render's free plan sleeps a service after ~15 minutes of inactivity, and the
+  // first request afterwards waits on a cold start. Rather than show a skeleton
+  // for a minute with no explanation, say what is happening.
+  const [waking, setWaking] = useState(false)
   const [loadingCont, setLoadingCont] = useState(false)
   const [loadingDetail, setLoadingDetail] = useState(false)
 
@@ -44,6 +48,7 @@ export default function Home() {
   const loadBase = useCallback(async () => {
     setLoadingBase(true)
     setFatal(null)
+    const wakeTimer = setTimeout(() => setWaking(true), 5000)
     try {
       const [topo, crit] = await Promise.all([
         getJson<Topology>('/api/topology'),
@@ -55,6 +60,8 @@ export default function Home() {
     } catch (err) {
       setFatal(err instanceof Error ? err.message : 'Unknown error')
     } finally {
+      clearTimeout(wakeTimer)
+      setWaking(false)
       setLoadingBase(false)
     }
   }, [])
@@ -168,7 +175,16 @@ export default function Home() {
 
       <div className="map">
         {loadingBase ? (
-          <div style={{ padding: 24 }}><Skeleton rows={8} /></div>
+          <div style={{ padding: 24 }}>
+            {waking && (
+              <p className="small muted" style={{ marginBottom: 14 }}>
+                Waking the backend — the free hosting tier sleeps after a period
+                of inactivity, so the first load can take up to a minute. Later
+                requests are fast.
+              </p>
+            )}
+            <Skeleton rows={8} />
+          </div>
         ) : (
           <GridMap
             substations={topology!.substations}

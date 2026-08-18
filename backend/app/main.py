@@ -54,18 +54,34 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# In production the frontend is served by this same process, so requests are
-# same-origin and CORS is irrelevant. It exists for development, where `next dev`
-# runs on :3000 and uvicorn on :8000. Origins are explicit, never a wildcard.
-_dev_origins = os.getenv(
-    "CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
-).split(",")
+# CORS. The frontend is deployed to Vercel and this API to Render, so every
+# browser request is cross-origin and the allow-list is load-bearing, not a
+# development convenience.
+#
+#   CORS_ORIGINS       comma-separated exact origins (production domain, local dev)
+#   CORS_ORIGIN_REGEX  optional pattern, used for Vercel preview deployments,
+#                      whose hostnames change on every push
+#
+# Never a wildcard: this API is public and unauthenticated, so the allow-list is
+# the only thing stating who is expected to call it.
+_origins = [
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
+    ).split(",")
+    if origin.strip()
+]
+_origin_regex = os.getenv("CORS_ORIGIN_REGEX") or None
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[o.strip() for o in _dev_origins if o.strip()],
-    allow_methods=["GET"],
+    allow_origins=_origins,
+    allow_origin_regex=_origin_regex,
+    allow_methods=["GET", "OPTIONS"],
     allow_headers=["*"],
+    max_age=3600,
 )
+log.info("CORS allow-list: %s%s", _origins, f" + regex {_origin_regex}" if _origin_regex else "")
 
 app.include_router(grid.router)
 

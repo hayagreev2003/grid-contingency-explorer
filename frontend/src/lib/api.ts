@@ -1,11 +1,16 @@
 /**
  * Client for the FastAPI backend.
  *
- * In production the built frontend is served by FastAPI itself, so the API is
- * same-origin and the base is empty. In development `next dev` runs on :3000
- * while uvicorn runs on :8000, and NEXT_PUBLIC_API_BASE bridges the two.
+ * The frontend is deployed to Vercel and the API to Render, so requests are
+ * cross-origin and NEXT_PUBLIC_API_BASE must point at the Render service. This
+ * is a static export, so that value is baked in at build time: changing the
+ * backend URL requires a rebuild, not just an environment change.
+ *
+ * Falling back to an empty string keeps same-origin working, which is what
+ * happens when FastAPI serves the built frontend itself (the single-process
+ * setup described in the README).
  */
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? ''
+export const API_BASE = (process.env.NEXT_PUBLIC_API_BASE ?? '').replace(/\/$/, '')
 
 export class ApiError extends Error {
   constructor(message: string, readonly status: number, readonly unreachable: boolean) {
