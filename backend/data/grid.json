@@ -1,0 +1,2133 @@
+{
+  "_provenance": {
+    "real": "Substation names/voltages, plant names/fuels/capacities, city names/peak demands, and the seven HVDC bipoles. Public CEA / Grid-India material, rounded.",
+    "approximate": "Coordinates point at the named town, not the surveyed switchyard.",
+    "synthetic": "AC corridor topology is generated in backend/scripts/topology.py, not the real line list."
+  },
+  "state_region": {
+    "Delhi": "NR",
+    "Haryana": "NR",
+    "Punjab": "NR",
+    "Rajasthan": "NR",
+    "Uttar Pradesh": "NR",
+    "Uttarakhand": "NR",
+    "Himachal Pradesh": "NR",
+    "Jammu & Kashmir": "NR",
+    "Chandigarh": "NR",
+    "Gujarat": "WR",
+    "Madhya Pradesh": "WR",
+    "Maharashtra": "WR",
+    "Chhattisgarh": "WR",
+    "Karnataka": "SR",
+    "Andhra Pradesh": "SR",
+    "Telangana": "SR",
+    "Tamil Nadu": "SR",
+    "Kerala": "SR",
+    "Bihar": "ER",
+    "Jharkhand": "ER",
+    "Odisha": "ER",
+    "West Bengal": "ER",
+    "Assam": "NER",
+    "Meghalaya": "NER",
+    "Tripura": "NER",
+    "Manipur": "NER",
+    "Arunachal Pradesh": "NER"
+  },
+  "substations": [
+    {
+      "id": "AGRA",
+      "name": "Agra",
+      "voltage_kv": 765,
+      "lat": 27.18,
+      "lon": 78.01,
+      "state": "Uttar Pradesh"
+    },
+    {
+      "id": "DADRI",
+      "name": "Dadri",
+      "voltage_kv": 400,
+      "lat": 28.59,
+      "lon": 77.6,
+      "state": "Uttar Pradesh"
+    },
+    {
+      "id": "MEERUT",
+      "name": "Meerut",
+      "voltage_kv": 765,
+      "lat": 28.98,
+      "lon": 77.71,
+      "state": "Uttar Pradesh"
+    },
+    {
+      "id": "KANPUR",
+      "name": "Kanpur",
+      "voltage_kv": 400,
+      "lat": 26.45,
+      "lon": 80.33,
+      "state": "Uttar Pradesh"
+    },
+    {
+      "id": "LUCKNOW",
+      "name": "Lucknow",
+      "voltage_kv": 400,
+      "lat": 26.85,
+      "lon": 80.95,
+      "state": "Uttar Pradesh"
+    },
+    {
+      "id": "ANPARA",
+      "name": "Anpara",
+      "voltage_kv": 400,
+      "lat": 24.2,
+      "lon": 82.79,
+      "state": "Uttar Pradesh"
+    },
+    {
+      "id": "BAREILLY",
+      "name": "Bareilly",
+      "voltage_kv": 400,
+      "lat": 28.37,
+      "lon": 79.43,
+      "state": "Uttar Pradesh"
+    },
+    {
+      "id": "BALLABGARH",
+      "name": "Ballabgarh",
+      "voltage_kv": 400,
+      "lat": 28.34,
+      "lon": 77.32,
+      "state": "Haryana"
+    },
+    {
+      "id": "PANIPAT",
+      "name": "Panipat",
+      "voltage_kv": 400,
+      "lat": 29.39,
+      "lon": 76.97,
+      "state": "Haryana"
+    },
+    {
+      "id": "HISAR",
+      "name": "Hisar",
+      "voltage_kv": 400,
+      "lat": 29.15,
+      "lon": 75.72,
+      "state": "Haryana"
+    },
+    {
+      "id": "BHIWANI",
+      "name": "Bhiwani",
+      "voltage_kv": 765,
+      "lat": 28.79,
+      "lon": 76.13,
+      "state": "Haryana"
+    },
+    {
+      "id": "KURUKSHETRA",
+      "name": "Kurukshetra",
+      "voltage_kv": 800,
+      "lat": 29.97,
+      "lon": 76.88,
+      "state": "Haryana"
+    },
+    {
+      "id": "MOGA",
+      "name": "Moga",
+      "voltage_kv": 400,
+      "lat": 30.81,
+      "lon": 75.17,
+      "state": "Punjab"
+    },
+    {
+      "id": "JALANDHAR",
+      "name": "Jalandhar",
+      "voltage_kv": 400,
+      "lat": 31.33,
+      "lon": 75.58,
+      "state": "Punjab"
+    },
+    {
+      "id": "AMRITSAR",
+      "name": "Amritsar",
+      "voltage_kv": 400,
+      "lat": 31.63,
+      "lon": 74.87,
+      "state": "Punjab"
+    },
+    {
+      "id": "HEERAPURA",
+      "name": "Heerapura (Jaipur)",
+      "voltage_kv": 400,
+      "lat": 26.88,
+      "lon": 75.72,
+      "state": "Rajasthan"
+    },
+    {
+      "id": "BHIWADI",
+      "name": "Bhiwadi",
+      "voltage_kv": 765,
+      "lat": 28.21,
+      "lon": 76.86,
+      "state": "Rajasthan"
+    },
+    {
+      "id": "MERTA",
+      "name": "Merta",
+      "voltage_kv": 765,
+      "lat": 26.65,
+      "lon": 74.03,
+      "state": "Rajasthan"
+    },
+    {
+      "id": "BIKANER",
+      "name": "Bikaner",
+      "voltage_kv": 765,
+      "lat": 28.02,
+      "lon": 73.31,
+      "state": "Rajasthan"
+    },
+    {
+      "id": "BHADLA",
+      "name": "Bhadla",
+      "voltage_kv": 765,
+      "lat": 27.54,
+      "lon": 71.92,
+      "state": "Rajasthan"
+    },
+    {
+      "id": "JAISALMER",
+      "name": "Jaisalmer",
+      "voltage_kv": 400,
+      "lat": 26.92,
+      "lon": 70.91,
+      "state": "Rajasthan"
+    },
+    {
+      "id": "KOTA",
+      "name": "Kota",
+      "voltage_kv": 400,
+      "lat": 25.18,
+      "lon": 75.83,
+      "state": "Rajasthan"
+    },
+    {
+      "id": "RAWATBHATA",
+      "name": "Rawatbhata",
+      "voltage_kv": 400,
+      "lat": 24.93,
+      "lon": 75.58,
+      "state": "Rajasthan"
+    },
+    {
+      "id": "RISHIKESH",
+      "name": "Rishikesh",
+      "voltage_kv": 400,
+      "lat": 30.1,
+      "lon": 78.29,
+      "state": "Uttarakhand"
+    },
+    {
+      "id": "ROORKEE",
+      "name": "Roorkee",
+      "voltage_kv": 400,
+      "lat": 29.85,
+      "lon": 77.89,
+      "state": "Uttarakhand"
+    },
+    {
+      "id": "NATHPA",
+      "name": "Nathpa Jhakri",
+      "voltage_kv": 400,
+      "lat": 31.55,
+      "lon": 77.85,
+      "state": "Himachal Pradesh"
+    },
+    {
+      "id": "JAMMU",
+      "name": "Jammu",
+      "voltage_kv": 400,
+      "lat": 32.73,
+      "lon": 74.86,
+      "state": "Jammu & Kashmir"
+    },
+    {
+      "id": "KISHENPUR",
+      "name": "Kishenpur",
+      "voltage_kv": 400,
+      "lat": 32.94,
+      "lon": 75.15,
+      "state": "Jammu & Kashmir"
+    },
+    {
+      "id": "VADODARA",
+      "name": "Vadodara",
+      "voltage_kv": 400,
+      "lat": 22.31,
+      "lon": 73.18,
+      "state": "Gujarat"
+    },
+    {
+      "id": "ASOJ",
+      "name": "Asoj",
+      "voltage_kv": 765,
+      "lat": 22.4,
+      "lon": 73.3,
+      "state": "Gujarat"
+    },
+    {
+      "id": "LIMBDI",
+      "name": "Limbdi",
+      "voltage_kv": 765,
+      "lat": 22.57,
+      "lon": 71.81,
+      "state": "Gujarat"
+    },
+    {
+      "id": "JETPUR",
+      "name": "Jetpur",
+      "voltage_kv": 400,
+      "lat": 21.75,
+      "lon": 70.62,
+      "state": "Gujarat"
+    },
+    {
+      "id": "BHUJ",
+      "name": "Bhuj",
+      "voltage_kv": 400,
+      "lat": 23.24,
+      "lon": 69.67,
+      "state": "Gujarat"
+    },
+    {
+      "id": "MUNDRA",
+      "name": "Mundra",
+      "voltage_kv": 800,
+      "lat": 22.84,
+      "lon": 69.72,
+      "state": "Gujarat"
+    },
+    {
+      "id": "KAKRAPAR",
+      "name": "Kakrapar",
+      "voltage_kv": 400,
+      "lat": 21.24,
+      "lon": 73.35,
+      "state": "Gujarat"
+    },
+    {
+      "id": "NAGDA",
+      "name": "Nagda",
+      "voltage_kv": 400,
+      "lat": 23.45,
+      "lon": 75.42,
+      "state": "Madhya Pradesh"
+    },
+    {
+      "id": "INDORE",
+      "name": "Indore",
+      "voltage_kv": 400,
+      "lat": 22.72,
+      "lon": 75.86,
+      "state": "Madhya Pradesh"
+    },
+    {
+      "id": "BHOPAL",
+      "name": "Bhopal",
+      "voltage_kv": 400,
+      "lat": 23.26,
+      "lon": 77.41,
+      "state": "Madhya Pradesh"
+    },
+    {
+      "id": "ITARSI",
+      "name": "Itarsi",
+      "voltage_kv": 765,
+      "lat": 22.61,
+      "lon": 77.76,
+      "state": "Madhya Pradesh"
+    },
+    {
+      "id": "JABALPUR",
+      "name": "Jabalpur",
+      "voltage_kv": 765,
+      "lat": 23.18,
+      "lon": 79.99,
+      "state": "Madhya Pradesh"
+    },
+    {
+      "id": "SATNA",
+      "name": "Satna",
+      "voltage_kv": 765,
+      "lat": 24.6,
+      "lon": 80.83,
+      "state": "Madhya Pradesh"
+    },
+    {
+      "id": "VINDHYACHAL",
+      "name": "Vindhyachal",
+      "voltage_kv": 400,
+      "lat": 24.1,
+      "lon": 82.65,
+      "state": "Madhya Pradesh"
+    },
+    {
+      "id": "KALWA",
+      "name": "Kalwa (Mumbai)",
+      "voltage_kv": 400,
+      "lat": 19.2,
+      "lon": 73,
+      "state": "Maharashtra"
+    },
+    {
+      "id": "PADGHE",
+      "name": "Padghe",
+      "voltage_kv": 800,
+      "lat": 19.4,
+      "lon": 73.15,
+      "state": "Maharashtra"
+    },
+    {
+      "id": "BOISAR",
+      "name": "Boisar",
+      "voltage_kv": 400,
+      "lat": 19.8,
+      "lon": 72.75,
+      "state": "Maharashtra"
+    },
+    {
+      "id": "KARAD",
+      "name": "Karad",
+      "voltage_kv": 400,
+      "lat": 17.29,
+      "lon": 74.18,
+      "state": "Maharashtra"
+    },
+    {
+      "id": "PARLI",
+      "name": "Parli",
+      "voltage_kv": 400,
+      "lat": 18.85,
+      "lon": 76.53,
+      "state": "Maharashtra"
+    },
+    {
+      "id": "AURANGABAD",
+      "name": "Aurangabad",
+      "voltage_kv": 400,
+      "lat": 19.88,
+      "lon": 75.34,
+      "state": "Maharashtra"
+    },
+    {
+      "id": "WARDHA",
+      "name": "Wardha",
+      "voltage_kv": 765,
+      "lat": 20.75,
+      "lon": 78.6,
+      "state": "Maharashtra"
+    },
+    {
+      "id": "CHANDRAPUR",
+      "name": "Chandrapur",
+      "voltage_kv": 765,
+      "lat": 19.96,
+      "lon": 79.3,
+      "state": "Maharashtra"
+    },
+    {
+      "id": "RAIPUR",
+      "name": "Raipur",
+      "voltage_kv": 765,
+      "lat": 21.25,
+      "lon": 81.63,
+      "state": "Chhattisgarh"
+    },
+    {
+      "id": "BHILAI",
+      "name": "Bhilai",
+      "voltage_kv": 400,
+      "lat": 21.19,
+      "lon": 81.38,
+      "state": "Chhattisgarh"
+    },
+    {
+      "id": "KORBA",
+      "name": "Korba",
+      "voltage_kv": 400,
+      "lat": 22.35,
+      "lon": 82.68,
+      "state": "Chhattisgarh"
+    },
+    {
+      "id": "CHAMPA",
+      "name": "Champa",
+      "voltage_kv": 800,
+      "lat": 22.03,
+      "lon": 82.65,
+      "state": "Chhattisgarh"
+    },
+    {
+      "id": "RAIGARH",
+      "name": "Raigarh",
+      "voltage_kv": 800,
+      "lat": 21.9,
+      "lon": 83.4,
+      "state": "Chhattisgarh"
+    },
+    {
+      "id": "SIPAT",
+      "name": "Sipat",
+      "voltage_kv": 765,
+      "lat": 22.15,
+      "lon": 82.3,
+      "state": "Chhattisgarh"
+    },
+    {
+      "id": "KOLAR",
+      "name": "Kolar",
+      "voltage_kv": 800,
+      "lat": 13.14,
+      "lon": 78.13,
+      "state": "Karnataka"
+    },
+    {
+      "id": "HOODY",
+      "name": "Hoody (Bengaluru)",
+      "voltage_kv": 400,
+      "lat": 12.99,
+      "lon": 77.71,
+      "state": "Karnataka"
+    },
+    {
+      "id": "NELAMANGALA",
+      "name": "Nelamangala",
+      "voltage_kv": 400,
+      "lat": 13.1,
+      "lon": 77.39,
+      "state": "Karnataka"
+    },
+    {
+      "id": "HIRIYUR",
+      "name": "Hiriyur",
+      "voltage_kv": 765,
+      "lat": 13.94,
+      "lon": 76.62,
+      "state": "Karnataka"
+    },
+    {
+      "id": "DAVANAGERE",
+      "name": "Davanagere",
+      "voltage_kv": 400,
+      "lat": 14.47,
+      "lon": 75.92,
+      "state": "Karnataka"
+    },
+    {
+      "id": "NARENDRA",
+      "name": "Narendra (Hubli)",
+      "voltage_kv": 765,
+      "lat": 15.42,
+      "lon": 74.95,
+      "state": "Karnataka"
+    },
+    {
+      "id": "RAICHUR",
+      "name": "Raichur",
+      "voltage_kv": 400,
+      "lat": 16.2,
+      "lon": 77.36,
+      "state": "Karnataka"
+    },
+    {
+      "id": "KAIGA",
+      "name": "Kaiga",
+      "voltage_kv": 400,
+      "lat": 14.86,
+      "lon": 74.44,
+      "state": "Karnataka"
+    },
+    {
+      "id": "PAVAGADA",
+      "name": "Pavagada",
+      "voltage_kv": 400,
+      "lat": 14.1,
+      "lon": 77.28,
+      "state": "Karnataka"
+    },
+    {
+      "id": "KURNOOL",
+      "name": "Kurnool",
+      "voltage_kv": 765,
+      "lat": 15.83,
+      "lon": 78.04,
+      "state": "Andhra Pradesh"
+    },
+    {
+      "id": "CUDDAPAH",
+      "name": "Cuddapah",
+      "voltage_kv": 765,
+      "lat": 14.47,
+      "lon": 78.82,
+      "state": "Andhra Pradesh"
+    },
+    {
+      "id": "SIMHADRI",
+      "name": "Simhadri",
+      "voltage_kv": 400,
+      "lat": 17.6,
+      "lon": 83.11,
+      "state": "Andhra Pradesh"
+    },
+    {
+      "id": "VIJAYAWADA",
+      "name": "Vijayawada",
+      "voltage_kv": 400,
+      "lat": 16.51,
+      "lon": 80.65,
+      "state": "Andhra Pradesh"
+    },
+    {
+      "id": "SRISAILAM",
+      "name": "Srisailam",
+      "voltage_kv": 400,
+      "lat": 16.09,
+      "lon": 78.9,
+      "state": "Andhra Pradesh"
+    },
+    {
+      "id": "HYDERABAD",
+      "name": "Mamidipalli (Hyd)",
+      "voltage_kv": 400,
+      "lat": 17.22,
+      "lon": 78.48,
+      "state": "Telangana"
+    },
+    {
+      "id": "WARANGAL",
+      "name": "Warangal",
+      "voltage_kv": 765,
+      "lat": 17.98,
+      "lon": 79.59,
+      "state": "Telangana"
+    },
+    {
+      "id": "RAMAGUNDAM",
+      "name": "Ramagundam",
+      "voltage_kv": 400,
+      "lat": 18.76,
+      "lon": 79.47,
+      "state": "Telangana"
+    },
+    {
+      "id": "NIZAMABAD",
+      "name": "Nizamabad",
+      "voltage_kv": 400,
+      "lat": 18.67,
+      "lon": 78.09,
+      "state": "Telangana"
+    },
+    {
+      "id": "SRIPERUMBUDUR",
+      "name": "Sriperumbudur",
+      "voltage_kv": 765,
+      "lat": 12.97,
+      "lon": 79.94,
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "CHENNAI",
+      "name": "North Chennai",
+      "voltage_kv": 400,
+      "lat": 13.24,
+      "lon": 80.32,
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "SALEM",
+      "name": "Salem",
+      "voltage_kv": 765,
+      "lat": 11.66,
+      "lon": 78.15,
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "TRICHY",
+      "name": "Tiruchirappalli",
+      "voltage_kv": 400,
+      "lat": 10.79,
+      "lon": 78.7,
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "MADURAI",
+      "name": "Madurai",
+      "voltage_kv": 400,
+      "lat": 9.93,
+      "lon": 78.12,
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "UDUMALPET",
+      "name": "Udumalpet",
+      "voltage_kv": 400,
+      "lat": 10.58,
+      "lon": 77.25,
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "PUGALUR",
+      "name": "Pugalur",
+      "voltage_kv": 800,
+      "lat": 10.92,
+      "lon": 77.99,
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "TIRUNELVELI",
+      "name": "Tirunelveli",
+      "voltage_kv": 400,
+      "lat": 8.71,
+      "lon": 77.76,
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "NEYVELI",
+      "name": "Neyveli",
+      "voltage_kv": 400,
+      "lat": 11.6,
+      "lon": 79.48,
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "KOCHI",
+      "name": "Kochi",
+      "voltage_kv": 400,
+      "lat": 9.94,
+      "lon": 76.27,
+      "state": "Kerala"
+    },
+    {
+      "id": "THRISSUR",
+      "name": "Thrissur",
+      "voltage_kv": 400,
+      "lat": 10.53,
+      "lon": 76.21,
+      "state": "Kerala"
+    },
+    {
+      "id": "TRIVANDRUM",
+      "name": "Thiruvananthapuram",
+      "voltage_kv": 400,
+      "lat": 8.52,
+      "lon": 76.94,
+      "state": "Kerala"
+    },
+    {
+      "id": "RANCHI",
+      "name": "Ranchi",
+      "voltage_kv": 400,
+      "lat": 23.35,
+      "lon": 85.33,
+      "state": "Jharkhand"
+    },
+    {
+      "id": "JAMSHEDPUR",
+      "name": "Jamshedpur",
+      "voltage_kv": 400,
+      "lat": 22.8,
+      "lon": 86.2,
+      "state": "Jharkhand"
+    },
+    {
+      "id": "BOKARO",
+      "name": "Bokaro",
+      "voltage_kv": 400,
+      "lat": 23.67,
+      "lon": 86.15,
+      "state": "Jharkhand"
+    },
+    {
+      "id": "PATNA",
+      "name": "Patna",
+      "voltage_kv": 400,
+      "lat": 25.2,
+      "lon": 85.52,
+      "state": "Bihar"
+    },
+    {
+      "id": "BARH",
+      "name": "Barh",
+      "voltage_kv": 765,
+      "lat": 25.48,
+      "lon": 85.71,
+      "state": "Bihar"
+    },
+    {
+      "id": "GAYA",
+      "name": "Gaya",
+      "voltage_kv": 765,
+      "lat": 24.79,
+      "lon": 85,
+      "state": "Bihar"
+    },
+    {
+      "id": "PURNEA",
+      "name": "Purnea",
+      "voltage_kv": 400,
+      "lat": 25.78,
+      "lon": 87.47,
+      "state": "Bihar"
+    },
+    {
+      "id": "KAHALGAON",
+      "name": "Kahalgaon",
+      "voltage_kv": 400,
+      "lat": 25.27,
+      "lon": 87.23,
+      "state": "Bihar"
+    },
+    {
+      "id": "DURGAPUR",
+      "name": "Durgapur",
+      "voltage_kv": 400,
+      "lat": 23.52,
+      "lon": 87.31,
+      "state": "West Bengal"
+    },
+    {
+      "id": "SUBHASGRAM",
+      "name": "Subhasgram (Kol)",
+      "voltage_kv": 400,
+      "lat": 22.44,
+      "lon": 88.4,
+      "state": "West Bengal"
+    },
+    {
+      "id": "FARAKKA",
+      "name": "Farakka",
+      "voltage_kv": 800,
+      "lat": 24.8,
+      "lon": 87.9,
+      "state": "West Bengal"
+    },
+    {
+      "id": "PURULIA",
+      "name": "Purulia",
+      "voltage_kv": 400,
+      "lat": 23.33,
+      "lon": 86.36,
+      "state": "West Bengal"
+    },
+    {
+      "id": "ANGUL",
+      "name": "Angul",
+      "voltage_kv": 765,
+      "lat": 20.84,
+      "lon": 85.1,
+      "state": "Odisha"
+    },
+    {
+      "id": "TALCHER",
+      "name": "Talcher",
+      "voltage_kv": 800,
+      "lat": 20.95,
+      "lon": 85.23,
+      "state": "Odisha"
+    },
+    {
+      "id": "ROURKELA",
+      "name": "Rourkela",
+      "voltage_kv": 400,
+      "lat": 22.25,
+      "lon": 84.87,
+      "state": "Odisha"
+    },
+    {
+      "id": "JEYPORE",
+      "name": "Jeypore",
+      "voltage_kv": 400,
+      "lat": 18.86,
+      "lon": 82.57,
+      "state": "Odisha"
+    },
+    {
+      "id": "RENGALI",
+      "name": "Rengali",
+      "voltage_kv": 400,
+      "lat": 21.28,
+      "lon": 85.02,
+      "state": "Odisha"
+    },
+    {
+      "id": "BHUBANESWAR",
+      "name": "Bhubaneswar",
+      "voltage_kv": 400,
+      "lat": 20.3,
+      "lon": 85.82,
+      "state": "Odisha"
+    },
+    {
+      "id": "BONGAIGAON",
+      "name": "Bongaigaon",
+      "voltage_kv": 400,
+      "lat": 26.48,
+      "lon": 90.56,
+      "state": "Assam"
+    },
+    {
+      "id": "MISA",
+      "name": "Misa",
+      "voltage_kv": 400,
+      "lat": 26.2,
+      "lon": 92.6,
+      "state": "Assam"
+    },
+    {
+      "id": "BALIPARA",
+      "name": "Biswanath Chariali",
+      "voltage_kv": 800,
+      "lat": 26.72,
+      "lon": 92.77,
+      "state": "Assam"
+    },
+    {
+      "id": "SILCHAR",
+      "name": "Silchar",
+      "voltage_kv": 400,
+      "lat": 24.83,
+      "lon": 92.78,
+      "state": "Assam"
+    },
+    {
+      "id": "BYRNIHAT",
+      "name": "Byrnihat",
+      "voltage_kv": 400,
+      "lat": 25.96,
+      "lon": 91.87,
+      "state": "Meghalaya"
+    },
+    {
+      "id": "AGARTALA",
+      "name": "Agartala (Palatana)",
+      "voltage_kv": 400,
+      "lat": 23.6,
+      "lon": 91.32,
+      "state": "Tripura"
+    },
+    {
+      "id": "RANGANADI",
+      "name": "Ranganadi",
+      "voltage_kv": 400,
+      "lat": 27.2,
+      "lon": 93.85,
+      "state": "Arunachal Pradesh"
+    },
+    {
+      "id": "IMPHAL",
+      "name": "Imphal",
+      "voltage_kv": 400,
+      "lat": 24.82,
+      "lon": 93.94,
+      "state": "Manipur"
+    }
+  ],
+  "fixed_lines": [
+    {
+      "from": "TALCHER",
+      "to": "KOLAR",
+      "name": "Talcher–Kolar HVDC Bipole",
+      "capacity_mw": 2500,
+      "voltage_kv": 500,
+      "hvdc": true
+    },
+    {
+      "from": "CHAMPA",
+      "to": "KURUKSHETRA",
+      "name": "Champa–Kurukshetra HVDC Bipole",
+      "capacity_mw": 3000,
+      "voltage_kv": 800,
+      "hvdc": true
+    },
+    {
+      "from": "MUNDRA",
+      "to": "BHIWANI",
+      "name": "Mundra–Mohindergarh HVDC Bipole",
+      "capacity_mw": 2500,
+      "voltage_kv": 500,
+      "hvdc": true
+    },
+    {
+      "from": "RAIGARH",
+      "to": "PUGALUR",
+      "name": "Raigarh–Pugalur HVDC Bipole",
+      "capacity_mw": 6000,
+      "voltage_kv": 800,
+      "hvdc": true
+    },
+    {
+      "from": "PUGALUR",
+      "to": "THRISSUR",
+      "name": "Pugalur–Thrissur HVDC Link",
+      "capacity_mw": 2000,
+      "voltage_kv": 320,
+      "hvdc": true
+    },
+    {
+      "from": "BALIPARA",
+      "to": "AGRA",
+      "name": "Biswanath Chariali–Agra HVDC",
+      "capacity_mw": 6000,
+      "voltage_kv": 800,
+      "hvdc": true
+    },
+    {
+      "from": "FARAKKA",
+      "to": "SUBHASGRAM",
+      "name": "Farakka–Kolkata HVDC Link",
+      "capacity_mw": 1000,
+      "voltage_kv": 500,
+      "hvdc": true
+    },
+    {
+      "from": "VINDHYACHAL",
+      "to": "SATNA",
+      "name": "Vindhyachal–Satna 765kV",
+      "capacity_mw": 2400,
+      "voltage_kv": 765,
+      "hvdc": false
+    },
+    {
+      "from": "RAIPUR",
+      "to": "WARDHA",
+      "name": "Raipur–Wardha 765kV",
+      "capacity_mw": 2400,
+      "voltage_kv": 765,
+      "hvdc": false
+    },
+    {
+      "from": "WARDHA",
+      "to": "WARANGAL",
+      "name": "Wardha–Warangal 765kV",
+      "capacity_mw": 2400,
+      "voltage_kv": 765,
+      "hvdc": false
+    },
+    {
+      "from": "ANGUL",
+      "to": "JEYPORE",
+      "name": "Angul–Jeypore 400kV",
+      "capacity_mw": 1200,
+      "voltage_kv": 400,
+      "hvdc": false
+    },
+    {
+      "from": "GAYA",
+      "to": "VINDHYACHAL",
+      "name": "Gaya–Vindhyachal 765kV",
+      "capacity_mw": 2400,
+      "voltage_kv": 765,
+      "hvdc": false
+    },
+    {
+      "from": "AGRA",
+      "to": "BHIWADI",
+      "name": "Agra–Bhiwadi 765kV",
+      "capacity_mw": 2400,
+      "voltage_kv": 765,
+      "hvdc": false
+    },
+    {
+      "from": "BHADLA",
+      "to": "BIKANER",
+      "name": "Bhadla–Bikaner 765kV",
+      "capacity_mw": 2400,
+      "voltage_kv": 765,
+      "hvdc": false
+    },
+    {
+      "from": "KURNOOL",
+      "to": "HIRIYUR",
+      "name": "Kurnool–Hiriyur 765kV",
+      "capacity_mw": 2400,
+      "voltage_kv": 765,
+      "hvdc": false
+    },
+    {
+      "from": "SALEM",
+      "to": "SRIPERUMBUDUR",
+      "name": "Salem–Sriperumbudur 765kV",
+      "capacity_mw": 2400,
+      "voltage_kv": 765,
+      "hvdc": false
+    },
+    {
+      "from": "NARENDRA",
+      "to": "KARAD",
+      "name": "Narendra–Karad 765kV",
+      "capacity_mw": 2400,
+      "voltage_kv": 765,
+      "hvdc": false
+    },
+    {
+      "from": "BONGAIGAON",
+      "to": "PURNEA",
+      "name": "Bongaigaon–Purnea 400kV",
+      "capacity_mw": 1200,
+      "voltage_kv": 400,
+      "hvdc": false
+    },
+    {
+      "from": "JABALPUR",
+      "to": "ITARSI",
+      "name": "Jabalpur–Itarsi 765kV",
+      "capacity_mw": 2400,
+      "voltage_kv": 765,
+      "hvdc": false
+    }
+  ],
+  "plants": [
+    {
+      "id": "VINDHYACHAL_STPS",
+      "name": "Vindhyachal STPS",
+      "fuel": "coal",
+      "capacity_mw": 4760,
+      "cuf": 0.7,
+      "substation": "VINDHYACHAL",
+      "state": "Madhya Pradesh"
+    },
+    {
+      "id": "SINGRAULI_STPS",
+      "name": "Singrauli STPS",
+      "fuel": "coal",
+      "capacity_mw": 2000,
+      "cuf": 0.68,
+      "substation": "VINDHYACHAL",
+      "state": "Uttar Pradesh"
+    },
+    {
+      "id": "RIHAND_STPS",
+      "name": "Rihand STPS",
+      "fuel": "coal",
+      "capacity_mw": 3000,
+      "cuf": 0.72,
+      "substation": "ANPARA",
+      "state": "Uttar Pradesh"
+    },
+    {
+      "id": "ANPARA_TPS",
+      "name": "Anpara TPS",
+      "fuel": "coal",
+      "capacity_mw": 2630,
+      "cuf": 0.65,
+      "substation": "ANPARA",
+      "state": "Uttar Pradesh"
+    },
+    {
+      "id": "DADRI_NTPC",
+      "name": "NTPC Dadri",
+      "fuel": "coal",
+      "capacity_mw": 1820,
+      "cuf": 0.6,
+      "substation": "DADRI",
+      "state": "Uttar Pradesh"
+    },
+    {
+      "id": "MUNDRA_UMPP",
+      "name": "Mundra UMPP",
+      "fuel": "coal",
+      "capacity_mw": 4000,
+      "cuf": 0.6,
+      "substation": "MUNDRA",
+      "state": "Gujarat"
+    },
+    {
+      "id": "MUNDRA_TPS",
+      "name": "Mundra TPS",
+      "fuel": "coal",
+      "capacity_mw": 4620,
+      "cuf": 0.55,
+      "substation": "MUNDRA",
+      "state": "Gujarat"
+    },
+    {
+      "id": "TALCHER_STPS",
+      "name": "Talcher STPS",
+      "fuel": "coal",
+      "capacity_mw": 3000,
+      "cuf": 0.78,
+      "substation": "TALCHER",
+      "state": "Odisha"
+    },
+    {
+      "id": "SIPAT_STPS",
+      "name": "Sipat STPS",
+      "fuel": "coal",
+      "capacity_mw": 2980,
+      "cuf": 0.75,
+      "substation": "SIPAT",
+      "state": "Chhattisgarh"
+    },
+    {
+      "id": "KORBA_STPS",
+      "name": "Korba STPS",
+      "fuel": "coal",
+      "capacity_mw": 2600,
+      "cuf": 0.8,
+      "substation": "KORBA",
+      "state": "Chhattisgarh"
+    },
+    {
+      "id": "CHANDRAPUR_STPS",
+      "name": "Chandrapur STPS",
+      "fuel": "coal",
+      "capacity_mw": 2920,
+      "cuf": 0.62,
+      "substation": "CHANDRAPUR",
+      "state": "Maharashtra"
+    },
+    {
+      "id": "FARAKKA_STPS",
+      "name": "Farakka STPS",
+      "fuel": "coal",
+      "capacity_mw": 2100,
+      "cuf": 0.65,
+      "substation": "FARAKKA",
+      "state": "West Bengal"
+    },
+    {
+      "id": "KAHALGAON_STPS",
+      "name": "Kahalgaon STPS",
+      "fuel": "coal",
+      "capacity_mw": 2340,
+      "cuf": 0.7,
+      "substation": "KAHALGAON",
+      "state": "Bihar"
+    },
+    {
+      "id": "BARH_STPS",
+      "name": "Barh STPS",
+      "fuel": "coal",
+      "capacity_mw": 3300,
+      "cuf": 0.6,
+      "substation": "BARH",
+      "state": "Bihar"
+    },
+    {
+      "id": "RAMAGUNDAM_STPS",
+      "name": "Ramagundam STPS",
+      "fuel": "coal",
+      "capacity_mw": 2600,
+      "cuf": 0.72,
+      "substation": "RAMAGUNDAM",
+      "state": "Telangana"
+    },
+    {
+      "id": "SIMHADRI_STPS",
+      "name": "Simhadri STPS",
+      "fuel": "coal",
+      "capacity_mw": 2000,
+      "cuf": 0.7,
+      "substation": "SIMHADRI",
+      "state": "Andhra Pradesh"
+    },
+    {
+      "id": "NORTH_CHENNAI_TPS",
+      "name": "North Chennai TPS",
+      "fuel": "coal",
+      "capacity_mw": 1830,
+      "cuf": 0.68,
+      "substation": "CHENNAI",
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "RAICHUR_TPS",
+      "name": "Raichur TPS",
+      "fuel": "coal",
+      "capacity_mw": 1720,
+      "cuf": 0.6,
+      "substation": "RAICHUR",
+      "state": "Karnataka"
+    },
+    {
+      "id": "BOKARO_TPS",
+      "name": "Bokaro TPS",
+      "fuel": "coal",
+      "capacity_mw": 630,
+      "cuf": 0.55,
+      "substation": "BOKARO",
+      "state": "Jharkhand"
+    },
+    {
+      "id": "BONGAIGAON_TPS",
+      "name": "Bongaigaon TPS",
+      "fuel": "coal",
+      "capacity_mw": 750,
+      "cuf": 0.45,
+      "substation": "BONGAIGAON",
+      "state": "Assam"
+    },
+    {
+      "id": "NEYVELI_TS2",
+      "name": "Neyveli TS-II",
+      "fuel": "lignite",
+      "capacity_mw": 1470,
+      "cuf": 0.7,
+      "substation": "NEYVELI",
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "GANDHAR_CCGT",
+      "name": "Jhanor-Gandhar CCGT",
+      "fuel": "gas",
+      "capacity_mw": 657,
+      "cuf": 0.3,
+      "substation": "VADODARA",
+      "state": "Gujarat"
+    },
+    {
+      "id": "PALATANA_CCGT",
+      "name": "Palatana CCGT",
+      "fuel": "gas",
+      "capacity_mw": 726,
+      "cuf": 0.55,
+      "substation": "AGARTALA",
+      "state": "Tripura"
+    },
+    {
+      "id": "KAYAMKULAM_CCGT",
+      "name": "Kayamkulam CCGT",
+      "fuel": "gas",
+      "capacity_mw": 360,
+      "cuf": 0.15,
+      "substation": "KOCHI",
+      "state": "Kerala"
+    },
+    {
+      "id": "KUDANKULAM_NPP",
+      "name": "Kudankulam NPP",
+      "fuel": "nuclear",
+      "capacity_mw": 2000,
+      "cuf": 0.8,
+      "substation": "TIRUNELVELI",
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "TARAPUR_APS",
+      "name": "Tarapur APS",
+      "fuel": "nuclear",
+      "capacity_mw": 1400,
+      "cuf": 0.78,
+      "substation": "BOISAR",
+      "state": "Maharashtra"
+    },
+    {
+      "id": "RAJASTHAN_APS",
+      "name": "Rajasthan APS",
+      "fuel": "nuclear",
+      "capacity_mw": 1180,
+      "cuf": 0.75,
+      "substation": "RAWATBHATA",
+      "state": "Rajasthan"
+    },
+    {
+      "id": "KAKRAPAR_APS",
+      "name": "Kakrapar APS",
+      "fuel": "nuclear",
+      "capacity_mw": 1440,
+      "cuf": 0.76,
+      "substation": "KAKRAPAR",
+      "state": "Gujarat"
+    },
+    {
+      "id": "KAIGA_NPP",
+      "name": "Kaiga NPP",
+      "fuel": "nuclear",
+      "capacity_mw": 880,
+      "cuf": 0.78,
+      "substation": "KAIGA",
+      "state": "Karnataka"
+    },
+    {
+      "id": "TEHRI_HEP",
+      "name": "Tehri Hydro",
+      "fuel": "hydro",
+      "capacity_mw": 1000,
+      "cuf": 0.35,
+      "substation": "RISHIKESH",
+      "state": "Uttarakhand"
+    },
+    {
+      "id": "NATHPA_HEP",
+      "name": "Nathpa Jhakri HEP",
+      "fuel": "hydro",
+      "capacity_mw": 1500,
+      "cuf": 0.45,
+      "substation": "NATHPA",
+      "state": "Himachal Pradesh"
+    },
+    {
+      "id": "KOYNA_HEP",
+      "name": "Koyna Hydro",
+      "fuel": "hydro",
+      "capacity_mw": 1960,
+      "cuf": 0.3,
+      "substation": "KARAD",
+      "state": "Maharashtra"
+    },
+    {
+      "id": "SRISAILAM_HEP",
+      "name": "Srisailam Hydro",
+      "fuel": "hydro",
+      "capacity_mw": 1670,
+      "cuf": 0.28,
+      "substation": "SRISAILAM",
+      "state": "Andhra Pradesh"
+    },
+    {
+      "id": "SARDAR_SAROVAR",
+      "name": "Sardar Sarovar HEP",
+      "fuel": "hydro",
+      "capacity_mw": 1450,
+      "cuf": 0.3,
+      "substation": "ASOJ",
+      "state": "Gujarat"
+    },
+    {
+      "id": "SALAL_HEP",
+      "name": "Salal Hydro",
+      "fuel": "hydro",
+      "capacity_mw": 690,
+      "cuf": 0.4,
+      "substation": "JAMMU",
+      "state": "Jammu & Kashmir"
+    },
+    {
+      "id": "BAGLIHAR_HEP",
+      "name": "Baglihar Hydro",
+      "fuel": "hydro",
+      "capacity_mw": 900,
+      "cuf": 0.42,
+      "substation": "KISHENPUR",
+      "state": "Jammu & Kashmir"
+    },
+    {
+      "id": "PURULIA_PSP",
+      "name": "Purulia Pumped Storage",
+      "fuel": "hydro",
+      "capacity_mw": 900,
+      "cuf": 0.2,
+      "substation": "PURULIA",
+      "state": "West Bengal"
+    },
+    {
+      "id": "RENGALI_HEP",
+      "name": "Rengali Hydro",
+      "fuel": "hydro",
+      "capacity_mw": 250,
+      "cuf": 0.3,
+      "substation": "RENGALI",
+      "state": "Odisha"
+    },
+    {
+      "id": "RANGANADI_HEP",
+      "name": "Ranganadi HEP",
+      "fuel": "hydro",
+      "capacity_mw": 405,
+      "cuf": 0.38,
+      "substation": "RANGANADI",
+      "state": "Arunachal Pradesh"
+    },
+    {
+      "id": "BHADLA_SOLAR",
+      "name": "Bhadla Solar Park",
+      "fuel": "solar",
+      "capacity_mw": 2245,
+      "cuf": 0.25,
+      "substation": "BHADLA",
+      "state": "Rajasthan"
+    },
+    {
+      "id": "PAVAGADA_SOLAR",
+      "name": "Pavagada Solar Park",
+      "fuel": "solar",
+      "capacity_mw": 2050,
+      "cuf": 0.24,
+      "substation": "PAVAGADA",
+      "state": "Karnataka"
+    },
+    {
+      "id": "KURNOOL_SOLAR",
+      "name": "Kurnool Ultra Mega Solar",
+      "fuel": "solar",
+      "capacity_mw": 1000,
+      "cuf": 0.23,
+      "substation": "KURNOOL",
+      "state": "Andhra Pradesh"
+    },
+    {
+      "id": "REWA_SOLAR",
+      "name": "Rewa Ultra Mega Solar",
+      "fuel": "solar",
+      "capacity_mw": 750,
+      "cuf": 0.22,
+      "substation": "SATNA",
+      "state": "Madhya Pradesh"
+    },
+    {
+      "id": "KAMUTHI_SOLAR",
+      "name": "Kamuthi Solar",
+      "fuel": "solar",
+      "capacity_mw": 648,
+      "cuf": 0.21,
+      "substation": "MADURAI",
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "CHARANKA_SOLAR",
+      "name": "Charanka Solar Park",
+      "fuel": "solar",
+      "capacity_mw": 790,
+      "cuf": 0.22,
+      "substation": "LIMBDI",
+      "state": "Gujarat"
+    },
+    {
+      "id": "JAISALMER_WIND",
+      "name": "Jaisalmer Wind Park",
+      "fuel": "wind",
+      "capacity_mw": 1600,
+      "cuf": 0.28,
+      "substation": "JAISALMER",
+      "state": "Rajasthan"
+    },
+    {
+      "id": "MUPPANDAL_WIND",
+      "name": "Muppandal Wind Farm",
+      "fuel": "wind",
+      "capacity_mw": 1500,
+      "cuf": 0.3,
+      "substation": "TIRUNELVELI",
+      "state": "Tamil Nadu"
+    },
+    {
+      "id": "DHALGAON_WIND",
+      "name": "Dhalgaon Wind Farm",
+      "fuel": "wind",
+      "capacity_mw": 300,
+      "cuf": 0.22,
+      "substation": "KARAD",
+      "state": "Maharashtra"
+    },
+    {
+      "id": "KUTCH_WIND",
+      "name": "Kutch Wind Cluster",
+      "fuel": "wind",
+      "capacity_mw": 1100,
+      "cuf": 0.3,
+      "substation": "BHUJ",
+      "state": "Gujarat"
+    }
+  ],
+  "load_centres": [
+    {
+      "id": "DELHI",
+      "name": "Delhi",
+      "peak_demand_mw": 8000,
+      "population": 32000000,
+      "substation": "BALLABGARH",
+      "state": "Delhi",
+      "lat": 28.61,
+      "lon": 77.21
+    },
+    {
+      "id": "MUMBAI",
+      "name": "Mumbai",
+      "peak_demand_mw": 4000,
+      "population": 21000000,
+      "substation": "KALWA",
+      "state": "Maharashtra",
+      "lat": 19.08,
+      "lon": 72.88
+    },
+    {
+      "id": "BENGALURU",
+      "name": "Bengaluru",
+      "peak_demand_mw": 3600,
+      "population": 13000000,
+      "substation": "HOODY",
+      "state": "Karnataka",
+      "lat": 12.97,
+      "lon": 77.59
+    },
+    {
+      "id": "CHENNAI_C",
+      "name": "Chennai",
+      "peak_demand_mw": 3500,
+      "population": 11000000,
+      "substation": "CHENNAI",
+      "state": "Tamil Nadu",
+      "lat": 13.08,
+      "lon": 80.27
+    },
+    {
+      "id": "HYDERABAD_C",
+      "name": "Hyderabad",
+      "peak_demand_mw": 3400,
+      "population": 10500000,
+      "substation": "HYDERABAD",
+      "state": "Telangana",
+      "lat": 17.39,
+      "lon": 78.49
+    },
+    {
+      "id": "KOLKATA",
+      "name": "Kolkata",
+      "peak_demand_mw": 2500,
+      "population": 15000000,
+      "substation": "SUBHASGRAM",
+      "state": "West Bengal",
+      "lat": 22.57,
+      "lon": 88.36
+    },
+    {
+      "id": "AHMEDABAD",
+      "name": "Ahmedabad",
+      "peak_demand_mw": 3000,
+      "population": 8400000,
+      "substation": "LIMBDI",
+      "state": "Gujarat",
+      "lat": 23.02,
+      "lon": 72.57
+    },
+    {
+      "id": "PUNE",
+      "name": "Pune",
+      "peak_demand_mw": 2200,
+      "population": 7400000,
+      "substation": "KALWA",
+      "state": "Maharashtra",
+      "lat": 18.52,
+      "lon": 73.86
+    },
+    {
+      "id": "SURAT",
+      "name": "Surat",
+      "peak_demand_mw": 2400,
+      "population": 7200000,
+      "substation": "KAKRAPAR",
+      "state": "Gujarat",
+      "lat": 21.17,
+      "lon": 72.83
+    },
+    {
+      "id": "JAIPUR",
+      "name": "Jaipur",
+      "peak_demand_mw": 2600,
+      "population": 4100000,
+      "substation": "HEERAPURA",
+      "state": "Rajasthan",
+      "lat": 26.91,
+      "lon": 75.79
+    },
+    {
+      "id": "LUCKNOW_C",
+      "name": "Lucknow",
+      "peak_demand_mw": 2500,
+      "population": 3600000,
+      "substation": "LUCKNOW",
+      "state": "Uttar Pradesh",
+      "lat": 26.85,
+      "lon": 80.95
+    },
+    {
+      "id": "KANPUR_C",
+      "name": "Kanpur",
+      "peak_demand_mw": 1200,
+      "population": 3000000,
+      "substation": "KANPUR",
+      "state": "Uttar Pradesh",
+      "lat": 26.45,
+      "lon": 80.33
+    },
+    {
+      "id": "NAGPUR",
+      "name": "Nagpur",
+      "peak_demand_mw": 1100,
+      "population": 2900000,
+      "substation": "WARDHA",
+      "state": "Maharashtra",
+      "lat": 21.15,
+      "lon": 79.09
+    },
+    {
+      "id": "BHOPAL_C",
+      "name": "Bhopal",
+      "peak_demand_mw": 1500,
+      "population": 2400000,
+      "substation": "BHOPAL",
+      "state": "Madhya Pradesh",
+      "lat": 23.26,
+      "lon": 77.41
+    },
+    {
+      "id": "INDORE_C",
+      "name": "Indore",
+      "peak_demand_mw": 1400,
+      "population": 3300000,
+      "substation": "INDORE",
+      "state": "Madhya Pradesh",
+      "lat": 22.72,
+      "lon": 75.86
+    },
+    {
+      "id": "PATNA_C",
+      "name": "Patna",
+      "peak_demand_mw": 1400,
+      "population": 2400000,
+      "substation": "PATNA",
+      "state": "Bihar",
+      "lat": 25.59,
+      "lon": 85.14
+    },
+    {
+      "id": "RANCHI_C",
+      "name": "Ranchi",
+      "peak_demand_mw": 900,
+      "population": 1300000,
+      "substation": "RANCHI",
+      "state": "Jharkhand",
+      "lat": 23.34,
+      "lon": 85.31
+    },
+    {
+      "id": "JAMSHEDPUR_C",
+      "name": "Jamshedpur",
+      "peak_demand_mw": 600,
+      "population": 1400000,
+      "substation": "JAMSHEDPUR",
+      "state": "Jharkhand",
+      "lat": 22.8,
+      "lon": 86.2
+    },
+    {
+      "id": "BHUBANESWAR_C",
+      "name": "Bhubaneswar",
+      "peak_demand_mw": 900,
+      "population": 1200000,
+      "substation": "BHUBANESWAR",
+      "state": "Odisha",
+      "lat": 20.3,
+      "lon": 85.82
+    },
+    {
+      "id": "RAIPUR_C",
+      "name": "Raipur",
+      "peak_demand_mw": 1200,
+      "population": 1200000,
+      "substation": "RAIPUR",
+      "state": "Chhattisgarh",
+      "lat": 21.25,
+      "lon": 81.63
+    },
+    {
+      "id": "VIZAG",
+      "name": "Visakhapatnam",
+      "peak_demand_mw": 900,
+      "population": 2200000,
+      "substation": "SIMHADRI",
+      "state": "Andhra Pradesh",
+      "lat": 17.69,
+      "lon": 83.22
+    },
+    {
+      "id": "VIJAYAWADA_C",
+      "name": "Vijayawada",
+      "peak_demand_mw": 1000,
+      "population": 1700000,
+      "substation": "VIJAYAWADA",
+      "state": "Andhra Pradesh",
+      "lat": 16.51,
+      "lon": 80.65
+    },
+    {
+      "id": "WARANGAL_C",
+      "name": "Warangal",
+      "peak_demand_mw": 500,
+      "population": 830000,
+      "substation": "WARANGAL",
+      "state": "Telangana",
+      "lat": 17.98,
+      "lon": 79.59
+    },
+    {
+      "id": "COIMBATORE",
+      "name": "Coimbatore",
+      "peak_demand_mw": 1100,
+      "population": 2500000,
+      "substation": "UDUMALPET",
+      "state": "Tamil Nadu",
+      "lat": 11.02,
+      "lon": 76.96
+    },
+    {
+      "id": "MADURAI_C",
+      "name": "Madurai",
+      "peak_demand_mw": 800,
+      "population": 1700000,
+      "substation": "MADURAI",
+      "state": "Tamil Nadu",
+      "lat": 9.93,
+      "lon": 78.12
+    },
+    {
+      "id": "TRICHY_C",
+      "name": "Tiruchirappalli",
+      "peak_demand_mw": 600,
+      "population": 1000000,
+      "substation": "TRICHY",
+      "state": "Tamil Nadu",
+      "lat": 10.79,
+      "lon": 78.7
+    },
+    {
+      "id": "SALEM_C",
+      "name": "Salem",
+      "peak_demand_mw": 500,
+      "population": 920000,
+      "substation": "SALEM",
+      "state": "Tamil Nadu",
+      "lat": 11.66,
+      "lon": 78.15
+    },
+    {
+      "id": "KOCHI_C",
+      "name": "Kochi",
+      "peak_demand_mw": 900,
+      "population": 2100000,
+      "substation": "KOCHI",
+      "state": "Kerala",
+      "lat": 9.94,
+      "lon": 76.27
+    },
+    {
+      "id": "TVM",
+      "name": "Thiruvananthapuram",
+      "peak_demand_mw": 700,
+      "population": 1700000,
+      "substation": "TRIVANDRUM",
+      "state": "Kerala",
+      "lat": 8.52,
+      "lon": 76.94
+    },
+    {
+      "id": "KOZHIKODE",
+      "name": "Kozhikode",
+      "peak_demand_mw": 500,
+      "population": 1000000,
+      "substation": "THRISSUR",
+      "state": "Kerala",
+      "lat": 11.26,
+      "lon": 75.78
+    },
+    {
+      "id": "MYSURU",
+      "name": "Mysuru",
+      "peak_demand_mw": 500,
+      "population": 1000000,
+      "substation": "NELAMANGALA",
+      "state": "Karnataka",
+      "lat": 12.3,
+      "lon": 76.64
+    },
+    {
+      "id": "HUBBALLI",
+      "name": "Hubballi",
+      "peak_demand_mw": 500,
+      "population": 1100000,
+      "substation": "NARENDRA",
+      "state": "Karnataka",
+      "lat": 15.36,
+      "lon": 75.12
+    },
+    {
+      "id": "MANGALURU",
+      "name": "Mangaluru",
+      "peak_demand_mw": 400,
+      "population": 620000,
+      "substation": "KAIGA",
+      "state": "Karnataka",
+      "lat": 12.91,
+      "lon": 74.86
+    },
+    {
+      "id": "AMRITSAR_C",
+      "name": "Amritsar",
+      "peak_demand_mw": 900,
+      "population": 1300000,
+      "substation": "AMRITSAR",
+      "state": "Punjab",
+      "lat": 31.63,
+      "lon": 74.87
+    },
+    {
+      "id": "LUDHIANA",
+      "name": "Ludhiana",
+      "peak_demand_mw": 1400,
+      "population": 1700000,
+      "substation": "MOGA",
+      "state": "Punjab",
+      "lat": 30.9,
+      "lon": 75.86
+    },
+    {
+      "id": "CHANDIGARH_C",
+      "name": "Chandigarh",
+      "peak_demand_mw": 700,
+      "population": 1100000,
+      "substation": "KURUKSHETRA",
+      "state": "Chandigarh",
+      "lat": 30.73,
+      "lon": 76.78
+    },
+    {
+      "id": "DEHRADUN",
+      "name": "Dehradun",
+      "peak_demand_mw": 500,
+      "population": 800000,
+      "substation": "RISHIKESH",
+      "state": "Uttarakhand",
+      "lat": 30.32,
+      "lon": 78.03
+    },
+    {
+      "id": "VARANASI",
+      "name": "Varanasi",
+      "peak_demand_mw": 800,
+      "population": 1500000,
+      "substation": "ANPARA",
+      "state": "Uttar Pradesh",
+      "lat": 25.32,
+      "lon": 82.97
+    },
+    {
+      "id": "AGRA_C",
+      "name": "Agra",
+      "peak_demand_mw": 900,
+      "population": 1800000,
+      "substation": "AGRA",
+      "state": "Uttar Pradesh",
+      "lat": 27.18,
+      "lon": 78.01
+    },
+    {
+      "id": "MEERUT_C",
+      "name": "Meerut",
+      "peak_demand_mw": 900,
+      "population": 1500000,
+      "substation": "MEERUT",
+      "state": "Uttar Pradesh",
+      "lat": 28.98,
+      "lon": 77.71
+    },
+    {
+      "id": "BAREILLY_C",
+      "name": "Bareilly",
+      "peak_demand_mw": 500,
+      "population": 900000,
+      "substation": "BAREILLY",
+      "state": "Uttar Pradesh",
+      "lat": 28.37,
+      "lon": 79.43
+    },
+    {
+      "id": "JODHPUR",
+      "name": "Jodhpur",
+      "peak_demand_mw": 900,
+      "population": 1400000,
+      "substation": "MERTA",
+      "state": "Rajasthan",
+      "lat": 26.24,
+      "lon": 73.02
+    },
+    {
+      "id": "BIKANER_C",
+      "name": "Bikaner",
+      "peak_demand_mw": 500,
+      "population": 700000,
+      "substation": "BIKANER",
+      "state": "Rajasthan",
+      "lat": 28.02,
+      "lon": 73.31
+    },
+    {
+      "id": "KOTA_C",
+      "name": "Kota",
+      "peak_demand_mw": 700,
+      "population": 1200000,
+      "substation": "KOTA",
+      "state": "Rajasthan",
+      "lat": 25.18,
+      "lon": 75.83
+    },
+    {
+      "id": "HISAR_C",
+      "name": "Hisar",
+      "peak_demand_mw": 400,
+      "population": 300000,
+      "substation": "HISAR",
+      "state": "Haryana",
+      "lat": 29.15,
+      "lon": 75.72
+    },
+    {
+      "id": "GUWAHATI",
+      "name": "Guwahati",
+      "peak_demand_mw": 600,
+      "population": 1100000,
+      "substation": "MISA",
+      "state": "Assam",
+      "lat": 26.14,
+      "lon": 91.74
+    },
+    {
+      "id": "AGARTALA_C",
+      "name": "Agartala",
+      "peak_demand_mw": 300,
+      "population": 500000,
+      "substation": "AGARTALA",
+      "state": "Tripura",
+      "lat": 23.83,
+      "lon": 91.28
+    },
+    {
+      "id": "SHILLONG",
+      "name": "Shillong",
+      "peak_demand_mw": 200,
+      "population": 350000,
+      "substation": "BYRNIHAT",
+      "state": "Meghalaya",
+      "lat": 25.58,
+      "lon": 91.89
+    },
+    {
+      "id": "IMPHAL_C",
+      "name": "Imphal",
+      "peak_demand_mw": 250,
+      "population": 500000,
+      "substation": "IMPHAL",
+      "state": "Manipur",
+      "lat": 24.82,
+      "lon": 93.94
+    },
+    {
+      "id": "SILCHAR_C",
+      "name": "Silchar",
+      "peak_demand_mw": 200,
+      "population": 230000,
+      "substation": "SILCHAR",
+      "state": "Assam",
+      "lat": 24.83,
+      "lon": 92.78
+    },
+    {
+      "id": "JAMMU_C",
+      "name": "Jammu",
+      "peak_demand_mw": 800,
+      "population": 700000,
+      "substation": "JAMMU",
+      "state": "Jammu & Kashmir",
+      "lat": 32.73,
+      "lon": 74.86
+    },
+    {
+      "id": "SRINAGAR",
+      "name": "Srinagar",
+      "peak_demand_mw": 700,
+      "population": 1200000,
+      "substation": "KISHENPUR",
+      "state": "Jammu & Kashmir",
+      "lat": 34.08,
+      "lon": 74.8
+    },
+    {
+      "id": "GWALIOR",
+      "name": "Gwalior",
+      "peak_demand_mw": 600,
+      "population": 1100000,
+      "substation": "AGRA",
+      "state": "Madhya Pradesh",
+      "lat": 26.22,
+      "lon": 78.18
+    },
+    {
+      "id": "JABALPUR_C",
+      "name": "Jabalpur",
+      "peak_demand_mw": 600,
+      "population": 1300000,
+      "substation": "JABALPUR",
+      "state": "Madhya Pradesh",
+      "lat": 23.18,
+      "lon": 79.99
+    },
+    {
+      "id": "DURGAPUR_C",
+      "name": "Durgapur",
+      "peak_demand_mw": 500,
+      "population": 600000,
+      "substation": "DURGAPUR",
+      "state": "West Bengal",
+      "lat": 23.52,
+      "lon": 87.31
+    },
+    {
+      "id": "ROURKELA_C",
+      "name": "Rourkela",
+      "peak_demand_mw": 400,
+      "population": 540000,
+      "substation": "ROURKELA",
+      "state": "Odisha",
+      "lat": 22.25,
+      "lon": 84.87
+    },
+    {
+      "id": "AURANGABAD_C",
+      "name": "Chhatrapati Sambhajinagar",
+      "peak_demand_mw": 600,
+      "population": 1200000,
+      "substation": "AURANGABAD",
+      "state": "Maharashtra",
+      "lat": 19.88,
+      "lon": 75.34
+    },
+    {
+      "id": "NASHIK",
+      "name": "Nashik",
+      "peak_demand_mw": 700,
+      "population": 1500000,
+      "substation": "PADGHE",
+      "state": "Maharashtra",
+      "lat": 19.99,
+      "lon": 73.79
+    },
+    {
+      "id": "RAJKOT",
+      "name": "Rajkot",
+      "peak_demand_mw": 700,
+      "population": 1300000,
+      "substation": "JETPUR",
+      "state": "Gujarat",
+      "lat": 22.3,
+      "lon": 70.8
+    },
+    {
+      "id": "BHUJ_C",
+      "name": "Bhuj",
+      "peak_demand_mw": 250,
+      "population": 190000,
+      "substation": "BHUJ",
+      "state": "Gujarat",
+      "lat": 23.24,
+      "lon": 69.67
+    }
+  ]
+}

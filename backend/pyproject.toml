@@ -1,0 +1,15 @@
+[project]
+name = "cognodb-grid-backend"
+version = "1.0.0"
+description = "FastAPI backend for the Grid Contingency Explorer, backed by CognoDB over Bolt"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi==0.115.6",
+    "uvicorn[standard]==0.34.0",
+    "neo4j==5.27.0",
+    "pydantic==2.10.5",
+    "python-dotenv==1.0.1",
+]
+
+[tool.ruff]
+line-length = 100

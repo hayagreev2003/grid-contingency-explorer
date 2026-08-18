@@ -1,0 +1,153 @@
+:root {
+  --bg:        #0b0f14;
+  --panel:     #121820;
+  --panel-2:   #18202b;
+  --line:      #263243;
+  --text:      #e6edf5;
+  --muted:     #8b9bb0;
+  --accent:    #4da3ff;
+  --danger:    #ff5c5c;
+  --warn:      #ffb547;
+  --ok:        #3ddc97;
+
+  --coal:    #6b7684;
+  --lignite: #7d6b52;
+  --gas:     #b98cff;
+  --nuclear: #4da3ff;
+  --hydro:   #35c9d6;
+  --solar:   #ffc93c;
+  --wind:    #3ddc97;
+
+  --radius: 10px;
+  --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.01em; }
+h1 { font-size: 16px; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+h3 { font-size: 13px; }
+
+.app {
+  display: grid;
+  grid-template-columns: 300px 1fr 340px;
+  grid-template-rows: 52px 1fr;
+  grid-template-areas: 'head head head' 'left map right';
+  height: 100vh;
+}
+@media (max-width: 1100px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 52px auto auto auto;
+    grid-template-areas: 'head' 'map' 'left' 'right';
+    height: auto;
+  }
+}
+
+header {
+  grid-area: head;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+header .sub { color: var(--muted); font-size: 12px; }
+header .spacer { flex: 1; }
+
+.panel { background: var(--panel); overflow-y: auto; padding: 16px; }
+.panel.left  { grid-area: left;  border-right: 1px solid var(--line); }
+.panel.right { grid-area: right; border-left: 1px solid var(--line); }
+.map { grid-area: map; position: relative; min-height: 460px; }
+
+.stack > * + * { margin-top: 14px; }
+
+.card {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.stat { display: flex; align-items: baseline; gap: 8px; }
+.stat .value { font-family: var(--mono); font-size: 24px; font-weight: 600; }
+.stat .unit  { color: var(--muted); font-size: 12px; }
+.stat.danger .value { color: var(--danger); }
+.stat.ok .value { color: var(--ok); }
+
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.mono  { font-family: var(--mono); }
+
+button {
+  font: inherit;
+  color: inherit;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #06121f; font-weight: 600; }
+button.ghost { background: transparent; }
+
+select {
+  font: inherit; color: inherit; width: 100%;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 7px 9px;
+}
+
+ul.list { list-style: none; margin: 0; padding: 0; }
+ul.list li {
+  display: flex; justify-content: space-between; gap: 10px;
+  padding: 7px 0; border-bottom: 1px solid var(--line);
+}
+ul.list li:last-child { border-bottom: 0; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: 999px; padding: 3px 9px; font-size: 12px;
+}
+.chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+.chip button { padding: 0 2px; border: 0; background: none; color: var(--muted); }
+
+.bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.bar > span { display: block; height: 100%; }
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, var(--panel-2) 25%, #1f2836 50%, var(--panel-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s infinite linear;
+  border-radius: 6px;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
+
+.banner {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-radius: var(--radius);
+  border: 1px solid var(--danger);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+
+.empty { text-align: center; padding: 26px 12px; color: var(--muted); }
