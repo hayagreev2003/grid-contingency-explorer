@@ -2,6 +2,10 @@
 
 import type { AdequacyRow, CriticalLine, FuelMixRow, IslandedRow, SupplyPath } from '@/lib/types'
 
+/** Mirrors ADEQUACY_HOPS in backend/app/queries.py -- the depth the adequacy
+ *  sweep searches to. Stated in the copy so "secure" is not an unqualified claim. */
+const ADEQUACY_HOPS = 3
+
 const FUEL_COLOR: Record<string, string> = {
   coal: 'var(--coal)', lignite: 'var(--lignite)', gas: 'var(--gas)',
   nuclear: 'var(--nuclear)', hydro: 'var(--hydro)', solar: 'var(--solar)',
@@ -56,7 +60,7 @@ export function AdequacyPanel({
         </div>
         <p className="small muted" style={{ margin: '6px 0 0' }}>
           The network re-routes around this outage: every city still has enough
-          deliverable capacity within {3} hops to cover its peak demand.
+          deliverable capacity within {ADEQUACY_HOPS} hops to cover its peak demand.
         </p>
       </div>
     )

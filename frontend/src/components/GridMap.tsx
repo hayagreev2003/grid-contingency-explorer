@@ -30,6 +30,35 @@ const W = 1000
 const H = 1100
 const PAD = 40
 
+const HVDC = '#b98cff'
+const EHV = '#4da3ff'
+const AC400 = '#3a4a60'
+
+/**
+ * The map encodes five variables at once -- line colour, line thickness, dot
+ * size, dot colour and the dashed stroke -- and none of them is self-evident to
+ * someone who has not read the README. The legend is the difference between a
+ * picture and a chart.
+ */
+function Legend() {
+  return (
+    <div className="legend" aria-hidden="true">
+      <div className="legend-row"><span className="swatch" style={{ background: EHV }} />765 kV corridor</div>
+      <div className="legend-row"><span className="swatch" style={{ background: HVDC }} />HVDC bipole</div>
+      <div className="legend-row"><span className="swatch" style={{ background: AC400 }} />400 kV corridor</div>
+      <div className="legend-row">
+        <span className="swatch dashed" />out of service
+      </div>
+      <div className="legend-sep" />
+      <div className="legend-row"><span className="dot-swatch" style={{ background: '#546682', width: 5, height: 5 }} />substation</div>
+      <div className="legend-row"><span className="dot-swatch" style={{ background: 'rgba(230,237,245,0.75)' }} />city · area ∝ peak demand</div>
+      <div className="legend-row"><span className="dot-swatch" style={{ background: 'var(--danger)' }} />city short of peak demand</div>
+      <div className="legend-sep" />
+      <div className="legend-hint">Line width ∝ capacity. Click a corridor to trip it, a city for its detail.</div>
+    </div>
+  )
+}
+
 /**
  * Plain SVG rather than a tile map: no API key, no external network request at
  * runtime, and the geometry is the point here — the graph, not the basemap.
@@ -58,12 +87,13 @@ export default function GridMap({
 
   const strokeFor = (l: MapLine) => {
     if (tripped.has(l.line_id)) return 'var(--danger)'
-    if (l.hvdc) return '#b98cff'
-    if (l.voltage_kv >= 765) return '#4da3ff'
-    return '#3a4a60'
+    if (l.hvdc) return HVDC
+    if (l.voltage_kv >= 765) return EHV
+    return AC400
   }
 
   return (
+    <>
     <svg
       viewBox={`0 0 ${W} ${H}`}
       style={{ width: '100%', height: '100%', display: 'block' }}
@@ -111,7 +141,7 @@ export default function GridMap({
             <circle
               key={s.id} cx={p.x} cy={p.y}
               r={s.voltage_kv >= 765 ? 3.4 : 2.2}
-              fill={s.voltage_kv >= 765 ? '#4da3ff' : '#546682'}
+              fill={s.voltage_kv >= 765 ? EHV : '#546682'}
             >
               <title>{s.name} · {s.voltage_kv} kV · {s.state}</title>
             </circle>
@@ -150,5 +180,7 @@ export default function GridMap({
         })}
       </g>
     </svg>
+    <Legend />
+    </>
   )
 }

@@ -151,3 +151,30 @@ ul.list li:last-child { border-bottom: 0; }
 }
 
 .empty { text-align: center; padding: 26px 12px; color: var(--muted); }
+
+/* Map legend. Overlaid in HTML rather than drawn in the SVG so it keeps a fixed
+   pixel size regardless of the viewBox scaling. */
+.legend {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  padding: 10px 12px;
+  background: rgba(18, 24, 32, 0.9);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  backdrop-filter: blur(4px);
+  font-size: 11px;
+  color: var(--muted);
+  pointer-events: none;
+  max-width: 230px;
+}
+.legend-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+.legend-sep { height: 1px; background: var(--line); margin: 7px 0; }
+.legend-hint { line-height: 1.45; opacity: 0.85; }
+.legend .swatch { width: 24px; height: 2.5px; border-radius: 2px; flex: none; }
+.legend .swatch.dashed {
+  background: none;
+  border-top: 2.5px dashed var(--danger);
+  height: 0;
+}
+.legend .dot-swatch { width: 9px; height: 9px; border-radius: 50%; flex: none; }

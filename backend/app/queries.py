@@ -5,7 +5,12 @@ Three conventions hold throughout:
  1. Nothing is interpolated. All user input arrives as bound parameters. The one
     thing Cypher genuinely cannot parameterise is the upper bound of a
     variable-length pattern (``*0..$n`` is a syntax error), so the bound is a
-    literal and the caller narrows it with ``size(c) <= $maxHops``.
+    literal and the caller narrows it with ``length(p) <= $maxHops``.
+
+    The only Cypher assembled from strings is the composition of the module
+    constants below (``_BOTTLENECK``, ``_SURVIVING``) into the statements. Those
+    are fixed source text, never request data: no value that arrives over HTTP
+    reaches a query except as a bound parameter.
 
  2. ``CONNECTS`` is stored in one direction but always traversed undirected
     (``-[c:CONNECTS*0..5]-``), because power flows either way along a line.

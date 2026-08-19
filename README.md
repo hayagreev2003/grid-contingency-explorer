@@ -7,7 +7,45 @@ longer be supplied to their peak demand — and which fuels they lose access to.
 over Bolt. **Next.js** front end, shipped as a static export. Deployed as two
 services: the frontend on **Vercel**, the API on **Render**.
 
+## Live demo
+
+| | |
+|---|---|
+| **Application** | <https://grid-contingency-explorer.vercel.app/> |
+| **API** | <https://grid-contigency-explorer.onrender.com/api/health> |
+| **Interactive API docs** | <https://grid-contigency-explorer.onrender.com/docs> |
+| **Screen recording** | _add the link here_ · shot list: [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) |
+
+The API runs on Render's free plan, which suspends a service after ~15 minutes
+of inactivity. **The first request after an idle period can take up to a
+minute** while the container starts; the UI says so rather than showing an
+unexplained spinner, and a scheduled workflow pings `/api/health` every ten
+minutes to keep it resident. Everything after the first request is fast.
+
+> One spelling trap, called out so nobody assumes a broken link: the Render
+> service is `grid-contigency-explorer` — missing an "n", a typo inherited from
+> the repository name — while the Vercel project is `grid-contingency-explorer`.
+> Both URLs above are correct as written.
+
+The database is a live CognoDB `c0` instance and will be kept running.
+
+## Screenshots
+
+**At rest — the whole network in service, every city supplied.**
+
+![The explorer at rest, no outages](docs/screenshot-rest.png)
+
+**Mundra–Mohindergarh HVDC tripped — Delhi goes 2,265 MW short.** The corridor
+is red and dashed, Delhi turns red on the map, and the coal share of what Delhi
+can draw on falls from 41.4% to 36.2%.
+
 ![The explorer with the Mundra–Mohindergarh HVDC bipole tripped](docs/screenshot-tripped.png)
+
+**The surviving routes.** Each row is one generator that can still reach Delhi:
+the fuel, the hop count, the bottleneck corridor on the best route, and the
+route itself. This panel is the variable-length traversal made visible.
+
+![Supply paths into Delhi after the outage](docs/screenshot-paths.png)
 
 ---
 
@@ -226,6 +264,9 @@ For development with hot reload on both sides, `./run-dev.sh` runs uvicorn on
   it, the bottleneck on each, and its deliverable fuel mix.
 - **The left panel ranks corridors** by the generation routed through them.
   Clicking one trips it.
+- **The legend, bottom left of the map**, decodes the five things the map encodes
+  at once: line colour (voltage class, HVDC, out of service), line width
+  (capacity), dot size (peak demand) and dot colour (short of demand).
 - Good ones to try: *Mundra–Mohindergarh HVDC* (strands Gujarat's coal from
   Delhi — 2,265 MW short), *Ballabgarh–Bhiwadi 400kV* (the largest single-line
   shortfall in the network), *Champa–Kurukshetra HVDC* (the most heavily loaded
@@ -250,7 +291,9 @@ backend/
 frontend/
   src/lib/api.ts     Typed fetch client; one place where an error becomes a state
   src/app/page.tsx   Client orchestration: outage set, selected city, hop limit
-  src/components/    GridMap (SVG) · Panels
+  src/components/    GridMap (SVG + legend) · Panels
+Dockerfile           Node build stage + Python runtime, for the single-service run
+render.yaml          Render Blueprint for the API service
 ```
 
 **One driver per process.** The Neo4j driver is a connection pool, not a
@@ -268,7 +311,10 @@ container that crash-loops out of sight.
 
 **No string-built Cypher.** Every parameter is bound. The one thing Cypher cannot
 parameterise — the upper bound of a variable-length pattern — is a literal in the
-query, narrowed by `length(p) <= $maxHops`.
+query, narrowed by `length(p) <= $maxHops`. `queries.py` does compose statements
+from two module constants (`_BOTTLENECK`, `_SURVIVING`) to avoid repeating the
+same fold in five places; those are fixed source text. No value that arrives over
+HTTP reaches a query except as a bound parameter.
 
 ## Writing for CognoDB, not Neo4j
 
@@ -389,10 +435,16 @@ frontend.
 ### 4. Verify the pair
 
 ```bash
-curl https://<service>.onrender.com/api/health
-curl -I -H "Origin: https://<project>.vercel.app" \
-     https://<service>.onrender.com/api/health   # expect access-control-allow-origin
+curl https://grid-contigency-explorer.onrender.com/api/health
+# -> {"status":"ok","counts":{"substations":112,"plants":49,"load_centres":60,"lines":230}}
+
+curl -I -H "Origin: https://grid-contingency-explorer.vercel.app" \
+     https://grid-contigency-explorer.onrender.com/api/health
+# -> access-control-allow-origin: https://grid-contingency-explorer.vercel.app
 ```
+
+Both were run against the live pair while writing this. The counts are the
+served graph, not a fixture.
 
 ### The free-tier cold start, and what is done about it
 
@@ -418,6 +470,16 @@ running uvicorn gives one process on one origin, with CORS irrelevant:
 ```bash
 cd frontend && npm run build
 cd ../backend && .venv/bin/uvicorn app.main:app --port 8000
+```
+
+[`Dockerfile`](Dockerfile) packages exactly that arrangement: a Node stage builds
+the static export, and the final image carries only the Python runtime plus the
+emitted files — no Node, no `node_modules`. The connection details stay outside
+the image and arrive from the host at runtime.
+
+```bash
+docker build -t grid-explorer .
+docker run --rm -p 8000:8000 --env-file .env grid-explorer
 ```
 
 ## One more portability note
