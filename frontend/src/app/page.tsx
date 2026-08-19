@@ -1,10 +1,11 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { CitySearch } from '@/components/CitySearch'
 import GridMap, { MapLine, MapLoadCentre, MapSubstation } from '@/components/GridMap'
 import {
-  AdequacyPanel, CriticalLinesPanel, ErrorBanner, FuelMixPanel, NoticeBanner, Skeleton,
-  SupplyPathPanel,
+  AdequacyPanel, CriticalLinesPanel, DrawerHead, ErrorBanner, FuelMixPanel, NoticeBanner,
+  Skeleton, SupplyPathPanel,
 } from '@/components/Panels'
 import { AbortedError, ApiError, getJson, qs } from '@/lib/api'
 import type {
@@ -40,6 +41,10 @@ export default function Home() {
   const [attempt, setAttempt] = useState(0)
   const [selectedLoad, setSelectedLoad] = useState<string | null>(null)
   const [maxHops, setMaxHops] = useState(4)
+  // Which side panel is showing as a bottom sheet. Only the compact layout reads
+  // it -- above 1100px both panels are columns and always on screen, so the
+  // desktop rules simply never mention .open.
+  const [drawer, setDrawer] = useState<'left' | 'right' | null>(null)
 
   const [contingency, setContingency] = useState<{
     cities: AdequacyRow[]
@@ -141,6 +146,17 @@ export default function Home() {
     return () => { clearTimeout(timer); controller.abort() }
   }, [selectedLoad, trippedParam, maxHops, fatal, attempt, report, clearNotice])
 
+  const toggleDrawer = useCallback((which: 'left' | 'right') => {
+    setDrawer(prev => (prev === which ? null : which))
+  }, [])
+
+  useEffect(() => {
+    if (!drawer) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setDrawer(null) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [drawer])
+
   const toggleLine = useCallback((lineId: string) => {
     setTripped(prev =>
       prev.includes(lineId) ? prev.filter(id => id !== lineId) : [...prev, lineId],
@@ -156,6 +172,10 @@ export default function Home() {
     () => new Set((contingency?.at_risk ?? []).map(r => r.id)),
     [contingency],
   )
+  // With both sheets shut the tab bar is the only thing on a phone that can say
+  // what the outage cost, so it carries the headline rather than a bare count.
+  const atRiskCount = contingency?.at_risk.length ?? 0
+  const shortfallMw = contingency?.shortfall_mw ?? 0
   const lineNames = useMemo(
     () => new Map((topology?.lines ?? []).map(l => [l.line_id, l.name])),
     [topology],
@@ -179,7 +199,7 @@ export default function Home() {
   }
 
   return (
-    <div className="app">
+    <div className="app" data-drawer={drawer ?? 'none'}>
       <header>
         <h1>Grid Contingency Explorer</h1>
         <span className="sub">Indian bulk transmission network · CognoDB</span>
@@ -192,12 +212,17 @@ export default function Home() {
         )}
       </header>
 
-      <aside className="panel left stack">
+      <aside
+        id="panel-outages"
+        className={`panel left stack${drawer === 'left' ? ' open' : ''}`}
+        aria-label="Outage set"
+      >
+        <DrawerHead title="Outage set" onClose={() => setDrawer(null)} />
         <h2>Outage set</h2>
         {tripped.length === 0 ? (
           <p className="small muted">
-            Click any corridor on the map to take it out of service. Everything on
-            the right recomputes against the surviving network.
+            Take any corridor on the map out of service. Every panel recomputes
+            against the surviving network.
           </p>
         ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -214,7 +239,7 @@ export default function Home() {
         <h2>Most critical corridors</h2>
         <p className="small muted" style={{ marginTop: -6 }}>
           Ranked by the generation capacity whose shortest route to a city runs
-          through them. Click to trip.
+          through them. Select one to trip it.
         </p>
         <CriticalLinesPanel
           lines={critical} tripped={trippedSet}
@@ -248,7 +273,12 @@ export default function Home() {
         )}
       </div>
 
-      <aside className="panel right stack">
+      <aside
+        id="panel-analysis"
+        className={`panel right stack${drawer === 'right' ? ' open' : ''}`}
+        aria-label="Analysis"
+      >
+        <DrawerHead title="Analysis" onClose={() => setDrawer(null)} />
         {notice && (
           <NoticeBanner
             message={notice}
@@ -266,18 +296,12 @@ export default function Home() {
         />
 
         <h2>City detail</h2>
-        <select
-          value={selectedLoad ?? ''}
-          onChange={e => setSelectedLoad(e.target.value)}
+        <CitySearch
+          options={topology?.loadCentres ?? []}
+          value={selectedLoad}
+          onChange={setSelectedLoad}
           disabled={loadingBase}
-          aria-label="Select a load centre"
-        >
-          {(topology?.loadCentres ?? []).map(l => (
-            <option key={l.id} value={l.id}>
-              {l.name} — {l.peak_demand_mw.toLocaleString('en-IN')} MW
-            </option>
-          ))}
-        </select>
+        />
 
         <label className="small muted" style={{ display: 'block' }}>
           Reachable within {maxHops} hops
@@ -298,6 +322,35 @@ export default function Home() {
         <h3>Supply paths</h3>
         <SupplyPathPanel paths={paths} loading={loadingDetail} />
       </aside>
+
+      {/* Compact layout only: the handle for each sheet, and the one place that
+          says what an outage cost while both sheets are shut. */}
+      <nav className="tabbar" aria-label="Panels">
+        <button
+          onClick={() => toggleDrawer('left')}
+          aria-expanded={drawer === 'left'}
+          aria-controls="panel-outages"
+        >
+          Outage set
+          {tripped.length > 0 && <span className="badge on">{tripped.length}</span>}
+        </button>
+        <button
+          onClick={() => toggleDrawer('right')}
+          aria-expanded={drawer === 'right'}
+          aria-controls="panel-analysis"
+        >
+          {loadingCont ? (
+            <>Analysis <span className="badge">…</span></>
+          ) : atRiskCount > 0 ? (
+            <>
+              <span className="badge on">{atRiskCount}</span>
+              {(shortfallMw / 1000).toFixed(1)} GW short
+            </>
+          ) : (
+            <>Analysis <span className="badge">✓</span></>
+          )}
+        </button>
+      </nav>
     </div>
   )
 }

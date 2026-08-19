@@ -1,5 +1,7 @@
 'use client'
 
+import { useRef } from 'react'
+
 import type { AdequacyRow, CriticalLine, FuelMixRow, IslandedRow, SupplyPath } from '@/lib/types'
 
 /** Mirrors ADEQUACY_HOPS in backend/app/queries.py -- the depth the adequacy
@@ -10,6 +12,65 @@ const FUEL_COLOR: Record<string, string> = {
   coal: 'var(--coal)', lignite: 'var(--lignite)', gas: 'var(--gas)',
   nuclear: 'var(--nuclear)', hydro: 'var(--hydro)', solar: 'var(--solar)',
   wind: 'var(--wind)',
+}
+
+/**
+ * The header of a panel while it is a bottom sheet -- invisible on the desktop
+ * layout, where the same panel is a column. The grabber is not decoration: it
+ * drags, because a sheet that shows a handle and then refuses to be pulled down
+ * reads as broken.
+ *
+ * The gesture is bound to the header alone. Binding it to the whole sheet would
+ * have to fight the list underneath it for every downward swipe, and losing that
+ * fight means a sheet that dismisses itself when someone meant to scroll.
+ */
+export function DrawerHead({ title, onClose }: { title: string; onClose: () => void }) {
+  const startY = useRef<number | null>(null)
+  const sheet = useRef<HTMLElement | null>(null)
+
+  const offset = (clientY: number) => Math.max(0, clientY - (startY.current ?? clientY))
+
+  const onDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    sheet.current = e.currentTarget.closest('.panel')
+    if (!sheet.current) return
+    startY.current = e.clientY
+    // Capture keeps the move events coming when the finger leaves the header,
+    // which it does immediately -- but it is not worth losing the gesture over
+    // if the pointer is gone by the time we ask.
+    try { e.currentTarget.setPointerCapture(e.pointerId) } catch { /* no capture */ }
+  }
+
+  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (startY.current === null || !sheet.current) return
+    sheet.current.style.transition = 'none'
+    sheet.current.style.transform = `translateY(${offset(e.clientY)}px)`
+  }
+
+  const onUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (startY.current === null || !sheet.current) return
+    const dy = offset(e.clientY)
+    // Inline styles go before the class does, so the sheet animates home from
+    // where the finger left it rather than jumping there first.
+    sheet.current.style.transition = ''
+    sheet.current.style.transform = ''
+    startY.current = null
+    sheet.current = null
+    if (dy > 70) onClose()
+  }
+
+  return (
+    <div
+      className="drawer-head"
+      onPointerDown={onDown}
+      onPointerMove={onMove}
+      onPointerUp={onUp}
+      onPointerCancel={onUp}
+    >
+      <span className="grabber" aria-hidden="true" />
+      <span className="title">{title}</span>
+      <button className="drawer-close" onClick={onClose} aria-label={`Close ${title}`}>×</button>
+    </div>
+  )
 }
 
 export function Skeleton({ rows = 4 }: { rows?: number }) {
@@ -65,7 +126,7 @@ export function AdequacyPanel({
       <div className="empty">
         <div style={{ fontSize: 26, marginBottom: 6 }}>⚡</div>
         Every city can be supplied to its peak demand.<br />
-        <span className="small">Click a corridor on the map to take it out of service.</span>
+        <span className="small">Take a corridor on the map out of service to see what it costs.</span>
       </div>
     )
   }

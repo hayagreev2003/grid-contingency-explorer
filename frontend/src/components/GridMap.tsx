@@ -26,8 +26,14 @@ interface Props {
   onSelectLoad: (loadId: string) => void
 }
 
+// The viewBox is a fixed 1000 units wide and as tall as the container's aspect
+// ratio makes it. A constant 1000x1100 box was letterboxed inside every shape
+// that was not 10:11 -- worst on a phone, where the country ended up a square in
+// the middle of a tall screen with dead bands above and below it.
 const W = 1000
-const H = 1100
+const H0 = 1100
+const MIN_H = 620
+const MAX_H = 2400
 const PAD = 40
 
 const HVDC = '#b98cff'
@@ -51,12 +57,12 @@ const HOME: View = { k: 1, x: 0, y: 0 }
  * map half empty. At k = 1 the only legal offset is 0, which makes "reset" and
  * "zoomed all the way out" the same state.
  */
-function clampView(v: View): View {
+function clampView(v: View, h: number): View {
   const k = Math.min(MAX_K, Math.max(MIN_K, v.k))
   return {
     k,
     x: Math.min(0, Math.max((1 - k) * W, v.x)),
-    y: Math.min(0, Math.max((1 - k) * H, v.y)),
+    y: Math.min(0, Math.max((1 - k) * h, v.y)),
   }
 }
 
@@ -65,25 +71,51 @@ function clampView(v: View): View {
  * size, dot colour and the dashed stroke -- and none of them is self-evident to
  * someone who has not read the README. The legend is the difference between a
  * picture and a chart.
+ *
+ * On a phone it is also a third of the map, so it collapses to the pill that
+ * opens it. Which of the two it is stays a CSS question -- the toggle and the
+ * collapsed state only exist inside the compact media query -- so the desktop
+ * legend is never at the mercy of a media query read after hydration.
  */
 function Legend() {
+  // null until the first effect: the markup is prerendered, and a boolean picked
+  // on the server would be wrong for one of the two layouts. While it is null
+  // the CSS decides -- open where there is room, shut on a phone -- so nothing
+  // flashes and nothing has to be un-drawn.
+  const [open, setOpen] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    setOpen(!window.matchMedia('(max-width: 1100px)').matches)
+  }, [])
+
   return (
-    <div className="legend" aria-hidden="true">
-      <div className="legend-row"><span className="swatch" style={{ background: EHV }} />765 kV corridor</div>
-      <div className="legend-row"><span className="swatch" style={{ background: HVDC }} />HVDC bipole</div>
-      <div className="legend-row"><span className="swatch" style={{ background: AC400 }} />400 kV corridor</div>
-      <div className="legend-row">
-        <span className="swatch dashed" />out of service
-      </div>
-      <div className="legend-sep" />
-      <div className="legend-row"><span className="dot-swatch" style={{ background: '#546682', width: 5, height: 5 }} />substation</div>
-      <div className="legend-row"><span className="dot-swatch" style={{ background: 'rgba(230,237,245,0.75)' }} />city · area ∝ peak demand</div>
-      <div className="legend-row"><span className="dot-swatch" style={{ background: 'var(--danger)' }} />city short of peak demand</div>
-      <div className="legend-sep" />
-      <div className="legend-hint">
-        Line width ∝ capacity. Click a corridor to trip it, a city for its detail.
-        Scroll or use + / − to zoom, drag to pan — the corridors around Delhi are
-        short and need it.
+    <div className="legend" data-open={open === null ? undefined : open}>
+      <button
+        className="legend-toggle"
+        onClick={() => setOpen(o => o === null ? false : !o)}
+        aria-expanded={open ?? true}
+        aria-controls="map-legend-body"
+      >
+        <span className="caret" aria-hidden="true">▶</span>
+        Legend
+      </button>
+      <div className="legend-body" id="map-legend-body" aria-hidden="true">
+        <div className="legend-row"><span className="swatch" style={{ background: EHV }} />765 kV corridor</div>
+        <div className="legend-row"><span className="swatch" style={{ background: HVDC }} />HVDC bipole</div>
+        <div className="legend-row"><span className="swatch" style={{ background: AC400 }} />400 kV corridor</div>
+        <div className="legend-row">
+          <span className="swatch dashed" />out of service
+        </div>
+        <div className="legend-sep" />
+        <div className="legend-row"><span className="dot-swatch" style={{ background: '#546682', width: 5, height: 5 }} />substation</div>
+        <div className="legend-row"><span className="dot-swatch" style={{ background: 'rgba(230,237,245,0.75)' }} />city · area ∝ peak demand</div>
+        <div className="legend-row"><span className="dot-swatch" style={{ background: 'var(--danger)' }} />city short of peak demand</div>
+        <div className="legend-sep" />
+        <div className="legend-hint">
+          Line width ∝ capacity. Select a corridor to trip it, a city for its
+          detail. Scroll, pinch or use + / − to zoom, drag to pan — the corridors
+          around Delhi are short and need it.
+        </div>
       </div>
     </div>
   )
@@ -106,6 +138,8 @@ export default function GridMap({
 }: Props) {
   const svgRef = useRef<SVGSVGElement | null>(null)
   const [view, setView] = useState<View>(HOME)
+  // viewBox height, tracking the element's own aspect ratio.
+  const [H, setH] = useState(H0)
   const [panning, setPanning] = useState(false)
 
   // Live pointers, keyed by pointerId: one is a pan, two are a pinch.
@@ -114,6 +148,23 @@ export default function GridMap({
   const dragged = useRef(false)
   //: Where the current gesture started, in client pixels — the slop test's origin.
   const dragStart = useRef<{ x: number; y: number } | null>(null)
+
+  useEffect(() => {
+    const svg = svgRef.current
+    if (!svg || typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      if (!width || !height) return
+      const next = Math.round(Math.min(MAX_H, Math.max(MIN_H, (W * height) / width)))
+      // Ignore sub-8-unit jitter; a scrollbar appearing must not requeue a
+      // resize of the thing that made it appear.
+      setH(prev => (Math.abs(prev - next) < 8 ? prev : next))
+      // A shorter box can leave the current pan outside its own bounds.
+      setView(v => clampView(v, next))
+    })
+    ro.observe(svg)
+    return () => ro.disconnect()
+  }, [])
 
   const project = useMemo(() => {
     const lats = substations.map(s => s.lat)
@@ -130,7 +181,7 @@ export default function GridMap({
       x: ox + (lon - minLon) * s,
       y: H - oy - (lat - minLat) * s,
     })
-  }, [substations])
+  }, [substations, H])
 
   /** Client pixels -> viewBox units, via the element's own CTM so the letterboxing
    *  from preserveAspectRatio is accounted for rather than guessed at. */
@@ -142,7 +193,7 @@ export default function GridMap({
       x: inv.a * clientX + inv.c * clientY + inv.e,
       y: inv.b * clientX + inv.d * clientY + inv.f,
     }
-  }, [])
+  }, [H])
 
   /** Scale by `factor`, keeping whatever is under (clientX, clientY) fixed. */
   const zoomBy = useCallback((factor: number, clientX?: number, clientY?: number) => {
@@ -156,9 +207,9 @@ export default function GridMap({
         k,
         x: anchor.x - (anchor.x - prev.x) * ratio,
         y: anchor.y - (anchor.y - prev.y) * ratio,
-      })
+      }, H)
     })
-  }, [toLocal])
+  }, [toLocal, H])
 
   // Wheel is registered by hand because React's wheel listener is passive, and a
   // passive listener cannot preventDefault -- the page would scroll as well.
@@ -205,7 +256,7 @@ export default function GridMap({
         // exactly at any zoom level and at any panel width.
         const from = toLocal(prev.x, prev.y)
         const to = toLocal(e.clientX, e.clientY)
-        setView(v => clampView({ ...v, x: v.x + (to.x - from.x), y: v.y + (to.y - from.y) }))
+        setView(v => clampView({ ...v, x: v.x + (to.x - from.x), y: v.y + (to.y - from.y) }, H))
       }
       if (!dragged.current) {
         const start = dragStart.current
@@ -229,7 +280,7 @@ export default function GridMap({
       window.removeEventListener('pointerup', onUp)
       window.removeEventListener('pointercancel', onUp)
     }
-  }, [toLocal, zoomBy])
+  }, [toLocal, zoomBy, H])
 
   const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return

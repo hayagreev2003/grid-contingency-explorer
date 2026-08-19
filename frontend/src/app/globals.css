@@ -20,6 +20,11 @@
 
   --radius: 10px;
   --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+
+  /* Height of the compact-layout tab bar. Everything that floats over the map
+     bottom (the legend) is offset by it. */
+  --tabbar-h: 56px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
 }
 
 * { box-sizing: border-box; }
@@ -34,6 +39,7 @@ html, body {
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
 h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.01em; }
@@ -47,14 +53,6 @@ h3 { font-size: 13px; }
   grid-template-rows: 52px 1fr;
   grid-template-areas: 'head head head' 'left map right';
   height: 100vh;
-}
-@media (max-width: 1100px) {
-  .app {
-    grid-template-columns: 1fr;
-    grid-template-rows: 52px auto auto auto;
-    grid-template-areas: 'head' 'map' 'left' 'right';
-    height: auto;
-  }
 }
 
 header {
@@ -75,6 +73,9 @@ header .spacer { flex: 1; }
 .map { grid-area: map; position: relative; min-height: 460px; }
 
 .stack > * + * { margin-top: 14px; }
+/* The drawer header is display:none on this layout; its successor should not
+   inherit a gap from a box that is not there. */
+.stack > .drawer-head + * { margin-top: 0; }
 
 .card {
   background: var(--panel-2);
@@ -114,6 +115,88 @@ select {
   border-radius: 7px;
   padding: 7px 9px;
 }
+
+/* The default control is a white track on a dark panel, and its thumb is a
+   20px target. Both are worth the ten lines. */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  margin: 8px 0 2px;
+  background: none;
+}
+input[type='range']::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 2px; background: var(--line);
+}
+input[type='range']::-moz-range-track {
+  height: 4px; border-radius: 2px; background: var(--line);
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px; margin-top: -7px;
+  border-radius: 50%; background: var(--accent);
+  border: 2px solid var(--panel); cursor: pointer;
+}
+input[type='range']::-moz-range-thumb {
+  width: 18px; height: 18px;
+  border-radius: 50%; background: var(--accent);
+  border: 2px solid var(--panel); cursor: pointer;
+}
+input[type='range']:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--text); }
+
+/* Type-ahead over the load centres. See components/CitySearch.tsx. */
+.combo { position: relative; }
+.combo-input {
+  font: inherit;
+  color: inherit;
+  width: 100%;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 8px 30px 8px 10px;
+}
+.combo-input::placeholder { color: var(--muted); }
+.combo-input:focus { outline: none; border-color: var(--accent); }
+.combo-input:disabled { opacity: 0.45; }
+.combo-caret {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 11px;
+  pointer-events: none;
+}
+.combo-list {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 262px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+}
+.combo-opt {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.combo-opt.active { background: var(--panel); }
+.combo-opt.current { color: var(--accent); }
+.combo-opt.current .muted { color: var(--accent); opacity: 0.75; }
+.combo-empty { padding: 12px 9px; color: var(--muted); font-size: 12px; }
 
 ul.list { list-style: none; margin: 0; padding: 0; }
 ul.list li {
@@ -174,6 +257,7 @@ ul.list li:last-child { border-bottom: 0; }
   color: var(--muted);
   pointer-events: none;
   max-width: 230px;
+  z-index: 20;
 }
 .legend-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
 .legend-sep { height: 1px; background: var(--line); margin: 7px 0; }
@@ -185,6 +269,43 @@ ul.list li:last-child { border-bottom: 0; }
   height: 0;
 }
 .legend .dot-swatch { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+
+/* The legend costs a corner of a 1440px map and a third of a phone screen, so it
+   collapses to the pill that opens it at any width. Only the default differs:
+   open where there is room, shut where there is not, decided once on mount.
+
+   Until that decision lands the element carries no data-open at all, and the
+   rule below is the compact layout's answer for that tick -- so the phone does
+   not paint a full legend and then take it away. */
+.legend-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--muted);
+  min-height: 34px;
+  /* The legend itself is transparent to the pointer so the map can be dragged
+     under it; the one control in it is not. */
+  pointer-events: auto;
+}
+.legend-toggle .caret { transition: transform .18s ease; font-size: 9px; }
+.legend[data-open='true'] .legend-toggle .caret { transform: rotate(90deg); }
+.legend-body { margin-top: 9px; }
+
+.legend[data-open='false'] {
+  padding: 0;
+  border: 0;
+  background: none;
+  backdrop-filter: none;
+}
+.legend[data-open='false'] .legend-body { display: none; }
+.legend[data-open='false'] .legend-toggle {
+  background: rgba(18, 24, 32, 0.92);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(4px);
+}
 
 /* Map zoom controls. Overlaid in HTML for the same reason as the legend: fixed
    pixel size, and buttons that are reachable by keyboard for anyone who cannot
@@ -201,6 +322,7 @@ ul.list li:last-child { border-bottom: 0; }
   border: 1px solid var(--line);
   border-radius: var(--radius);
   backdrop-filter: blur(4px);
+  z-index: 20;
 }
 .map-controls button {
   width: 28px;
@@ -220,4 +342,205 @@ ul.list li:last-child { border-bottom: 0; }
   padding: 0 6px 0 2px;
   min-width: 34px;
   text-align: right;
+}
+
+/* Drawer chrome: inert on the desktop layout, where the panels are columns. */
+.drawer-head { display: none; }
+.tabbar { display: none; }
+
+/* ---------------------------------------------------------------------------
+   Compact layout. Below 1100px the three columns leave the map a strip a few
+   hundred pixels wide, which is the one thing on the page that needs room. So
+   the map takes the whole viewport and the two panels become bottom sheets.
+
+   The sheets are deliberately non-modal -- no scrim. The loop the app exists for
+   is "trip a corridor, read what it cost", and a modal sheet would make that
+   close, tap, re-open on every click.
+   --------------------------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 52px 1fr;
+    grid-template-areas: 'head' 'map';
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  header { padding: 0 12px; gap: 10px; }
+  header h1 { font-size: 15px; }
+  header .sub { display: none; }
+
+  .map { min-height: 0; transition: padding-bottom .26s cubic-bezier(.32, .72, 0, 1); }
+
+  /* An open sheet covers the lower half of the map, which is where the map put
+     its content -- the country is centred in whatever box it is given. Shrinking
+     the box is what tells it to re-centre into the strip that is still visible;
+     GridMap watches its own size and re-fits. */
+  .app[data-drawer='left'] .map,
+  .app[data-drawer='right'] .map { padding-bottom: min(62dvh, 560px); }
+
+  /* The legend is positioned against the map's padding box, so it stays under an
+     open sheet however the map is shrunk. Nothing to be gained by drawing it. */
+  .app[data-drawer='left'] .legend,
+  .app[data-drawer='right'] .legend { opacity: 0; pointer-events: none; }
+  .legend { transition: opacity .2s ease; }
+
+  .panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--tabbar-h) + var(--safe-b));
+    z-index: 40;
+    max-height: min(62dvh, 560px);
+    padding: 0 14px 18px;
+    border: 1px solid var(--line);
+    border-bottom: 0;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -16px 38px rgba(0, 0, 0, 0.5);
+    overscroll-behavior: contain;
+    transform: translateY(100%);
+    visibility: hidden;
+    transition: transform .26s cubic-bezier(.32, .72, 0, 1), visibility 0s .26s;
+  }
+  .panel.open {
+    transform: none;
+    visibility: visible;
+    transition: transform .26s cubic-bezier(.32, .72, 0, 1);
+  }
+
+  .drawer-head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 -14px;
+    padding: 16px 14px 10px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    touch-action: none;
+    cursor: grab;
+  }
+  .drawer-head .grabber {
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 38px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--line);
+  }
+  .drawer-head .title {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .panel.stack > .drawer-head + * { margin-top: 12px; }
+  /* The sheet's own header already says "Outage set"; the section heading under
+     it would say it twice. The right panel holds several sections, so its
+     headings stay. */
+  .panel.left > h2:first-of-type { display: none; }
+  .panel.left > h2:first-of-type + * { margin-top: 12px; }
+  .drawer-head .drawer-close {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    font-size: 19px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+
+  .tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 45;
+    display: flex;
+    gap: 8px;
+    padding: 8px 12px calc(8px + var(--safe-b));
+    background: var(--panel);
+    border-top: 1px solid var(--line);
+  }
+  .tabbar button {
+    flex: 1;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+  .tabbar button[aria-expanded='true'] {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .tabbar .badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    min-width: 19px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--muted);
+  }
+  .tabbar .badge.on { background: var(--danger); border-color: var(--danger); color: #140406; }
+
+  /* Legend and zoom controls clear the tab bar and shrink to a phone's corner. */
+  .legend {
+    pointer-events: auto;
+    left: 12px;
+    bottom: calc(var(--tabbar-h) + var(--safe-b) + 12px);
+    max-width: min(272px, calc(100vw - 24px));
+    padding: 8px 10px;
+  }
+  /* Before the mount decides, a phone shows the pill, not the panel. */
+  .legend:not([data-open]) {
+    padding: 0;
+    border: 0;
+    background: none;
+    backdrop-filter: none;
+  }
+  .legend:not([data-open]) .legend-body { display: none; }
+  .legend:not([data-open]) .legend-toggle {
+    background: rgba(18, 24, 32, 0.92);
+    border: 1px solid var(--line);
+    backdrop-filter: blur(4px);
+  }
+
+  .map-controls { top: 10px; right: 10px; gap: 2px; }
+  .map-controls button { width: 36px; height: 36px; font-size: 17px; }
+
+  /* Touch targets. Everything tappable gets to 36-44px without redrawing it. */
+  button { padding: 8px 12px; }
+  select { padding: 11px 10px; }
+  /* Under 16px, iOS Safari zooms the page when the field takes focus. */
+  select, .combo-input { font-size: 16px; }
+  .combo-input { padding: 11px 32px 11px 12px; }
+  .combo-opt { padding: 11px 10px; }
+  .combo-list { max-height: 46dvh; }
+  ul.list li { padding: 10px 0; }
+  .chip { padding: 5px 11px; }
+  .chip button { min-width: 24px; min-height: 24px; justify-content: center; }
+  input[type='range'] { height: 30px; }
+}
+
+@media (max-width: 420px) {
+  header { gap: 8px; }
+  header h1 { font-size: 14px; }
+  .stat .value { font-size: 21px; }
+  .tabbar button { padding: 8px 6px; font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel { transition: none; }
+  .legend-toggle .caret { transition: none; }
 }
