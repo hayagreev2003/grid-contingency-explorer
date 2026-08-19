@@ -20,9 +20,14 @@ from app.config import ConfigError, get_settings
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run every query against the live instance.")
     parser.add_argument(
+        "--live",
         "--live-q4",
+        dest="live",
         action="store_true",
-        help="also run the live-traversal form of Q4 (slow; times out on the free tier)",
+        help=(
+            "also run the reference live-traversal forms of Q4 and Q3b "
+            "(slow; both exceed the statement deadline on the free tier)"
+        ),
     )
     args = parser.parse_args()
 
@@ -50,13 +55,17 @@ def main() -> int:
             print(f"    {counts}")
 
             crit = run("critical lines (Q4)", q.CRITICAL_LINES, limit=5)
-            if args.live_q4:
+            if args.live:
                 run("critical lines (Q4 live)", q.CRITICAL_LINES_LIVE, limit=5)
             base = run("adequacy, no outage (Q3)", q.ADEQUACY, tripped=[])
             print(
                 f"    -> {sum(1 for r in base if r['at_risk'])} cities short of peak demand at rest"
             )
-            run("islanding check (Q3b)", q.ISLANDED, tripped=[])
+            # Q3b is computed in-process from the cached topology, not queried:
+            # the traversal form below is combinatorial in the mesh and the free
+            # tier answers it with OutOfTimeError. See app.routers.grid._islanded.
+            if args.live:
+                run("islanding check (Q3b live)", q.ISLANDED_LIVE, tripped=[])
 
             worst_id = crit[0]["line_id"] if crit else None
             if worst_id:

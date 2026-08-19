@@ -6,6 +6,8 @@ in ``app.main`` so that "database unreachable" has exactly one representation.
 """
 from __future__ import annotations
 
+from collections import deque
+
 from fastapi import APIRouter, Query
 
 from app import queries as q
@@ -15,6 +17,7 @@ from app.models import (
     CriticalLinesResponse,
     FuelMixResponse,
     HealthResponse,
+    IslandedRow,
     SupplyPathResponse,
     Topology,
 )
@@ -30,6 +33,53 @@ _topology_cache: Topology | None = None
 # Same reasoning for the corridor ranking: it is stored on the relationships at
 # seed time and cannot change until the graph is re-seeded.
 _critical_cache: dict[int, CriticalLinesResponse] = {}
+# The substations plants inject into. Fixed by the topology, fetched once, and
+# used as the source set of the islanding sweep below.
+_injection_cache: set[str] | None = None
+
+
+async def _injection_points() -> set[str]:
+    global _injection_cache
+    if _injection_cache is None:
+        rows = await read_query(q.INJECTION_POINTS)
+        _injection_cache = {row["id"] for row in rows}
+    return _injection_cache
+
+
+def _islanded(topo: Topology, sources: set[str], tripped: list[str]) -> list[IslandedRow]:
+    """Cities with no surviving route to any generator, at any distance.
+
+    Reachability over a 112-node graph is a breadth-first sweep that visits each
+    substation once. Asking the database for it as `-[:CONNECTS*0..6]-` instead
+    enumerates every path up to depth 6 from every injection point, which the
+    free tier cannot finish inside its statement deadline (see
+    ``queries.ISLANDED_LIVE``). Done here it is also strictly more correct: no
+    depth cap, so a city reachable only at seven hops is no longer reported as
+    islanded.
+    """
+    out = set(tripped)
+    adjacency: dict[str, list[str]] = {}
+    for line in topo.lines:
+        if line.status != "IN_SERVICE" or line.line_id in out:
+            continue
+        adjacency.setdefault(line.from_, []).append(line.to)
+        adjacency.setdefault(line.to, []).append(line.from_)
+
+    energised = set(sources)
+    queue = deque(energised)
+    while queue:
+        for neighbour in adjacency.get(queue.popleft(), ()):
+            if neighbour not in energised:
+                energised.add(neighbour)
+                queue.append(neighbour)
+
+    return [
+        IslandedRow(
+            id=city.id, load_centre=city.name, demand_mw=city.peak_demand_mw
+        )
+        for city in topo.load_centres
+        if city.substation not in energised
+    ]
 
 
 def _tripped(raw: str | None) -> list[str]:
@@ -77,12 +127,14 @@ async def contingency(
     cities = await read_query(q.ADEQUACY, tripped=out)
     at_risk = [row for row in cities if row["at_risk"]]
 
-    # The islanding check walks to depth 6 and costs ~4.4 s on the free tier, so
-    # it only runs when it can possibly return something. A fully islanded city
-    # has zero deliverable capacity, which is necessarily below its peak demand,
-    # so the islanded set is a strict subset of the at-risk set: if nothing is
-    # short, nothing can be islanded.
-    islanded = await read_query(q.ISLANDED, tripped=out) if at_risk else []
+    # The islanding check runs against the cached topology rather than the
+    # database, so it costs nothing and is still skipped when it cannot return
+    # anything: a fully islanded city has zero deliverable capacity, which is
+    # necessarily below its peak demand, so the islanded set is a strict subset
+    # of the at-risk set. If nothing is short, nothing can be islanded.
+    islanded: list[IslandedRow] = []
+    if at_risk:
+        islanded = _islanded(await topology(), await _injection_points(), out)
     return ContingencyResponse(
         tripped=out,
         cities=cities,

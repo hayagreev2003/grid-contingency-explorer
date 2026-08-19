@@ -5,7 +5,13 @@ import logging
 from typing import Any
 
 from neo4j import AsyncDriver, AsyncGraphDatabase
-from neo4j.exceptions import AuthError, ConfigurationError, Neo4jError, ServiceUnavailable
+from neo4j.exceptions import (
+    AuthError,
+    ConfigurationError,
+    Neo4jError,
+    ServiceUnavailable,
+    TransientError,
+)
 
 from app.config import ConfigError, get_settings
 
@@ -19,6 +25,17 @@ _driver: AsyncDriver | None = None
 
 class DatabaseUnreachable(RuntimeError):
     """The database is not there. Distinct from 'the query was wrong'."""
+
+
+class QueryDeadlineExceeded(RuntimeError):
+    """The server abandoned the statement before finishing it.
+
+    CognoDB reports this as Neo.TransientError.General.OutOfTimeError, "context
+    deadline exceeded". The database is healthy and the query is valid: it was
+    too expensive for the instance to finish, which is a capacity answer, not a
+    fault. It gets its own class so the UI can say so and offer a retry rather
+    than showing "query failed" for something that is only slow.
+    """
 
 
 def get_driver() -> AsyncDriver:
@@ -67,6 +84,10 @@ async def read_query(cypher: str, /, **params: Any) -> list[dict[str, Any]]:
             return [record.data() async for record in result]
     except (ServiceUnavailable, AuthError, ConfigurationError, OSError) as exc:
         raise _as_unreachable(exc) from exc
+    except TransientError as exc:
+        if "OutOfTimeError" in str(exc.code or "") or "deadline" in str(exc):
+            raise QueryDeadlineExceeded(str(exc)) from exc
+        raise
     except Neo4jError:
         # A real query error: surface it as a 500 and log the detail.
         raise
@@ -94,6 +115,7 @@ def _as_unreachable(exc: Exception) -> Exception:
 __all__ = [
     "ConfigError",
     "DatabaseUnreachable",
+    "QueryDeadlineExceeded",
     "close_driver",
     "get_driver",
     "read_query",

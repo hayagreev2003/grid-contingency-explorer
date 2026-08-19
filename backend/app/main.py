@@ -16,7 +16,12 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import ConfigError, get_settings
-from app.db import DatabaseUnreachable, close_driver, verify_connectivity
+from app.db import (
+    DatabaseUnreachable,
+    QueryDeadlineExceeded,
+    close_driver,
+    verify_connectivity,
+)
 from app.routers import grid
 
 logging.basicConfig(
@@ -89,7 +94,8 @@ app.include_router(grid.router)
 # --------------------------------------------------------------- error handling
 #
 # Three outcomes, three status codes, one shape: {"error": str, "unreachable": bool}
-#   503  the database is not there, or is not configured -> UI offers a retry
+#   503  the database is not there, is not configured, or gave up on the
+#        statement before finishing it -> UI offers a retry
 #   422  the request was malformed (FastAPI's own validation)
 #   500  the query broke -> logged in full, generic message to the client
 
@@ -103,6 +109,22 @@ async def _unreachable(request: Request, exc: DatabaseUnreachable) -> JSONRespon
             "error": (
                 "The grid database is unreachable. Check that the CognoDB "
                 "instance is running and the connection details are correct."
+            ),
+            "unreachable": True,
+        },
+    )
+
+
+@app.exception_handler(QueryDeadlineExceeded)
+async def _deadline(request: Request, exc: QueryDeadlineExceeded) -> JSONResponse:
+    log.warning("statement deadline exceeded on %s: %s", request.url.path, exc)
+    return JSONResponse(
+        status_code=503,
+        content={
+            "error": (
+                "The grid database ran out of time answering that query. The "
+                "instance is healthy but too small to finish it -- try a smaller "
+                "outage set or fewer hops."
             ),
             "unreachable": True,
         },

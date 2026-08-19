@@ -159,7 +159,7 @@ are parameterised — there is no string-concatenated Cypher anywhere in the rep
 |---|---|---|
 | **Q1/Q2** | Which generators can still supply this city, by what route, and what is the weakest link on it? | Variable-length pattern, `reduce` bottleneck, ordered `collect(...)[0]` to keep the best route |
 | **Q3** | Which cities cannot be supplied to their peak demand under the current outage set? | Widest-path capacity per city, `OPTIONAL MATCH` so fully islanded cities still aggregate to zero |
-| **Q3b** | Is any city completely cut off from all generation? | Multi-source expansion, set difference |
+| **Q3b** | Is any city completely cut off from all generation? | Multi-source reachability over the cached topology; `ISLANDED_LIVE` is the Cypher form |
 | **Q4** | Which corridors carry the most generation? | `shortestPath` across all plant/city pairs, weighted by plant capacity |
 | **Q5** | What generation mix can this city actually draw on? | Widest path per plant, grouped by fuel |
 
@@ -342,7 +342,7 @@ instance:
 | Q3 adequacy | 0.3–1.6 s | runs on every click |
 | Q1/Q2 supply paths | 1.7 s | per selected city |
 | Q5 fuel mix | 1.6 s | per selected city |
-| Q3b islanding | 5.3 s | only run when a shortfall exists |
+| Q3b islanding | 5.3 s, later **timed out** | computed in-process from the cached topology |
 | Q4 as a live traversal | **timed out** | ~2,600 `shortestPath` searches |
 
 Two changes came out of that, both in the code with the reasoning attached:
@@ -351,13 +351,22 @@ Two changes came out of that, both in the code with the reasoning attached:
    the topology — it does not depend on the outage set — so `compute_corridor_load()`
    calculates it during seeding and stores `mw_carried` on each relationship. The
    API reads a property and sorts. The live traversal is kept as
-   `CRITICAL_LINES_LIVE` and can be run with `python -m scripts.smoke --live-q4`;
+   `CRITICAL_LINES_LIVE` and can be run with `python -m scripts.smoke --live`;
    Neo4j answers it in ~190 ms, CognoDB in 19 s before it began exceeding its
    statement deadline. Precomputing what cannot change is the honest fix.
-2. **The islanding check only runs when it can return something.** A fully
-   islanded city has zero deliverable capacity, which is necessarily below its
-   peak demand, so the islanded set is a strict subset of the at-risk set. If
-   nothing is short, nothing can be islanded — and 5.3 s leaves the hot path.
+2. **Q3b is computed in the API, not queried.** `-[:CONNECTS*0..6]-` from all 44
+   injection points enumerates every path up to depth 6 through a 112-substation
+   mesh — combinatorial in the graph, not linear — and CognoDB eventually stopped
+   answering it at all, with `Neo.TransientError.General.OutOfTimeError` ("context
+   deadline exceeded"). But islanding is reachability, and reachability visits each
+   node once. `grid._islanded()` sweeps it breadth-first over the already-cached
+   topology: no round trip, no depth cap (so a city reachable only at seven hops is
+   no longer wrongly reported as islanded), and identical results to the traversal
+   on every outage set they were compared on. `ISLANDED_LIVE` states the question
+   in Cypher and runs under `python -m scripts.smoke --live`.
+   It is still skipped when nothing is at risk: a fully islanded city has zero
+   deliverable capacity, which is necessarily below its peak demand, so the
+   islanded set is a strict subset of the at-risk set.
 
 The static topology and the corridor ranking are also cached in the API process,
 since neither changes until the graph is re-seeded.

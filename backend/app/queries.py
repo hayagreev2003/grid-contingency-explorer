@@ -195,10 +195,27 @@ RETURN l.id             AS id,
 ORDER BY shortfall_mw DESC
 """
 
-# The strict islanding check, kept because it is the extreme case and because
-# reporting "nothing is islanded, but N cities are short of capacity" is a more
-# truthful headline than either number alone.
-ISLANDED = f"""
+# Every substation a plant injects into: the source set for the islanding check.
+# Fixed by the topology, so the router caches it alongside the base network.
+INJECTION_POINTS = """
+MATCH (:Plant)-[:INJECTS_AT]->(s:Substation)
+RETURN DISTINCT s.id AS id
+"""
+
+# Reference implementation of the strict islanding check as a live traversal.
+#
+# Correct, and not runnable on the free tier: `-[:CONNECTS*0..6]-` enumerates
+# every path up to depth 6 from all 44 injection points across a 112-substation
+# mesh, which is combinatorial rather than linear in the graph. CognoDB answers
+# it with Neo.TransientError.General.OutOfTimeError -- the statement deadline,
+# not a connection fault.
+#
+# Islanding is reachability, and reachability visits each node once. The router
+# computes it with a breadth-first sweep over the cached topology instead
+# (`_islanded`): exact, no depth cap, no round trip. This statement is kept
+# because it states the question in Cypher, and is exercised by scripts.smoke
+# with --live so the equivalence stays checkable.
+ISLANDED_LIVE = f"""
 MATCH (:Plant)-[:INJECTS_AT]->(src:Substation)
 MATCH p = (src)-[:CONNECTS*0..6]-(reached:Substation)
 WHERE {_SURVIVING}
