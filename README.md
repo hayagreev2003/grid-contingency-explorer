@@ -260,6 +260,12 @@ For development with hot reload on both sides, `./run-dev.sh` runs uvicorn on
 
 - **Click any corridor on the map** to take it out of service. Everything
   recomputes against the surviving network.
+- **Zoom and pan the map** — scroll (or pinch, or the `+` / `−` buttons top
+  right) to zoom, drag to pan, `⤾` to reset. The corridors around Delhi are
+  short and tightly packed, and at 1× they are hard to hit; zooming spreads the
+  geometry apart while lines, dots and labels keep their size on screen, so the
+  click targets separate instead of growing. City names appear as the zoom makes
+  room for them.
 - **Click a city, or pick one from the dropdown**, to see the routes that supply
   it, the bottleneck on each, and its deliverable fuel mix.
 - **The left panel ranks corridors** by the generation routed through them.
