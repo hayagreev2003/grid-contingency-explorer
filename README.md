@@ -345,7 +345,7 @@ instance:
 | Q3b islanding | 5.3 s, later **timed out** | computed in-process from the cached topology |
 | Q4 as a live traversal | **timed out** | ~2,600 `shortestPath` searches |
 
-Two changes came out of that, both in the code with the reasoning attached:
+Three changes came out of that, all in the code with the reasoning attached:
 
 1. **Q4 is precomputed at seed time.** The corridor ranking is a pure function of
    the topology — it does not depend on the outage set — so `compute_corridor_load()`
@@ -367,6 +367,18 @@ Two changes came out of that, both in the code with the reasoning attached:
    It is still skipped when nothing is at risk: a fully islanded city has zero
    deliverable capacity, which is necessarily below its peak demand, so the
    islanded set is a strict subset of the at-risk set.
+
+3. **Load is shed before it reaches the instance, and what still fails says so.**
+   Each remaining traversal holds one of ten pooled connections for one to four
+   seconds. Clicking corridors quickly used to start a round of three queries per
+   click and cancel none of them, so answers for outage sets the UI had already
+   moved past kept computing until the pool ran dry — and the driver's
+   "failed to obtain a connection from the pool within 10.0s" arrived as an
+   unhandled 500 on requests that were themselves fine. Now a superseded request
+   is aborted, a burst of clicks is coalesced into one round, pool exhaustion is
+   its own `DatabaseBusy` → 503, and a statement that misses the deadline is
+   retried once before becoming one. None of those replace the UI: the map and
+   the outage set stay usable and the affected panel carries a retry.
 
 The static topology and the corridor ranking are also cached in the API process,
 since neither changes until the graph is re-seeded.

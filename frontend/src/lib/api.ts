@@ -19,21 +19,43 @@ export class ApiError extends Error {
   }
 }
 
-export async function getJson<T>(path: string): Promise<T> {
+/** Thrown when a request was superseded by a newer one and cancelled. */
+export class AbortedError extends Error {
+  constructor() {
+    super('Request superseded.')
+    this.name = 'AbortedError'
+  }
+}
+
+/**
+ * Every call takes a signal so the caller can cancel a request it no longer
+ * wants the answer to. This is load-bearing rather than tidy: each query holds
+ * one of ten pooled connections for seconds against the free-tier instance, so
+ * a few rapid clicks used to leave a queue of traversals computing outage sets
+ * the UI had already moved past, until the pool ran dry and the requests that
+ * mattered failed behind them.
+ */
+export async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
   let res: Response
   try {
-    res = await fetch(`${API_BASE}${path}`)
-  } catch {
+    res = await fetch(`${API_BASE}${path}`, { signal })
+  } catch (err) {
+    if (signal?.aborted || (err instanceof DOMException && err.name === 'AbortError')) {
+      throw new AbortedError()
+    }
     // The backend itself is down or unreachable from the browser.
     throw new ApiError('Cannot reach the application backend.', 0, true)
   }
 
   const body = await res.json().catch(() => ({ error: 'Malformed response from the server.' }))
   if (!res.ok) {
+    // `unreachable` is the server's own word for "there is nothing to talk to",
+    // and only that warrants replacing the UI with a retry screen. A 503 from a
+    // busy or timed-out query is transient and reported in place instead.
     throw new ApiError(
       body.error ?? `Request failed (${res.status})`,
       res.status,
-      Boolean(body.unreachable) || res.status === 503,
+      Boolean(body.unreachable),
     )
   }
   return body as T

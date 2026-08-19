@@ -150,6 +150,13 @@ ul.list li:last-child { border-bottom: 0; }
   background: color-mix(in srgb, var(--danger) 12%, transparent);
 }
 
+/* The transient sibling of .banner: same shape, warning rather than danger,
+   because the app is still usable when it appears. */
+.banner.notice {
+  border-color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 12%, transparent);
+}
+
 .empty { text-align: center; padding: 26px 12px; color: var(--muted); }
 
 /* Map legend. Overlaid in HTML rather than drawn in the SVG so it keeps a fixed

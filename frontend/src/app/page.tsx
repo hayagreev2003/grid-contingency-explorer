@@ -3,12 +3,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import GridMap, { MapLine, MapLoadCentre, MapSubstation } from '@/components/GridMap'
 import {
-  AdequacyPanel, CriticalLinesPanel, ErrorBanner, FuelMixPanel, Skeleton, SupplyPathPanel,
+  AdequacyPanel, CriticalLinesPanel, ErrorBanner, FuelMixPanel, NoticeBanner, Skeleton,
+  SupplyPathPanel,
 } from '@/components/Panels'
-import { getJson, qs } from '@/lib/api'
+import { AbortedError, ApiError, getJson, qs } from '@/lib/api'
 import type {
   AdequacyRow, CriticalLine, FuelMixRow, IslandedRow, SupplyPath,
 } from '@/lib/types'
+
+// How long a change to the outage set waits before it is asked about, so that a
+// run of clicks costs one round of queries instead of one per click. Short
+// enough to feel immediate, long enough to swallow a burst.
+const BURST_MS = 250
 
 interface Topology {
   substations: MapSubstation[]
@@ -22,6 +28,16 @@ export default function Home() {
   const [fatal, setFatal] = useState<string | null>(null)
 
   const [tripped, setTripped] = useState<string[]>([])
+  // A transient failure -- the instance busy, or a query it could not finish in
+  // time -- leaves the map and the outage set usable and says so in place. Only
+  // "there is no database to talk to" replaces the UI (`fatal`).
+  //
+  // Kept per source rather than as one string: the adequacy sweep and the city
+  // detail fail independently, and a success on one must not clear the other's
+  // notice while that panel is still showing nothing.
+  const [notices, setNotices] = useState<{ cont?: string; detail?: string }>({})
+  // Bumped by the notice's Retry button to re-run the queries below unchanged.
+  const [attempt, setAttempt] = useState(0)
   const [selectedLoad, setSelectedLoad] = useState<string | null>(null)
   const [maxHops, setMaxHops] = useState(4)
 
@@ -44,6 +60,23 @@ export default function Home() {
   const [loadingDetail, setLoadingDetail] = useState(false)
 
   const trippedParam = tripped.join(',')
+
+  // One place that decides what an error means: cancelled requests are not
+  // failures at all, an unreachable backend is fatal, and everything else is
+  // reported next to the panels it affected.
+  const report = useCallback((source: 'cont' | 'detail', err: unknown) => {
+    if (err instanceof AbortedError) return
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    if (err instanceof ApiError && !err.unreachable) {
+      setNotices(prev => ({ ...prev, [source]: message }))
+    } else {
+      setFatal(message)
+    }
+  }, [])
+
+  const clearNotice = useCallback((source: 'cont' | 'detail') => {
+    setNotices(prev => (source in prev ? { ...prev, [source]: undefined } : prev))
+  }, [])
 
   const loadBase = useCallback(async () => {
     setLoadingBase(true)
@@ -69,38 +102,54 @@ export default function Home() {
   useEffect(() => { void loadBase() }, [loadBase])
 
   // Q3 re-runs on every change to the outage set — that is the whole interaction.
+  //
+  // Two things keep that from flooding the instance. The request is aborted when
+  // the outage set changes again, so a superseded traversal stops occupying a
+  // connection instead of computing an answer nobody will read. And the round is
+  // held for BURST_MS first, so tripping five corridors in quick succession asks
+  // one question rather than five.
   useEffect(() => {
     if (fatal) return
-    let cancelled = false
+    const controller = new AbortController()
     setLoadingCont(true)
-    getJson<typeof contingency>(`/api/contingency${qs({ tripped: trippedParam })}`)
-      .then(data => { if (!cancelled) setContingency(data) })
-      .catch(err => { if (!cancelled) setFatal(err.message) })
-      .finally(() => { if (!cancelled) setLoadingCont(false) })
-    return () => { cancelled = true }
-  }, [trippedParam, fatal])
+    const timer = setTimeout(() => {
+      getJson<typeof contingency>(
+        `/api/contingency${qs({ tripped: trippedParam })}`, controller.signal,
+      )
+        .then(data => { setContingency(data); clearNotice('cont') })
+        .catch(err => report('cont', err))
+        .finally(() => { if (!controller.signal.aborted) setLoadingCont(false) })
+    }, BURST_MS)
+    return () => { clearTimeout(timer); controller.abort() }
+  }, [trippedParam, fatal, attempt, report, clearNotice])
 
   // Q1/Q2 and Q5 for the selected city.
   useEffect(() => {
     if (!selectedLoad || fatal) return
-    let cancelled = false
+    const controller = new AbortController()
     setLoadingDetail(true)
     const params = qs({ loadId: selectedLoad, tripped: trippedParam, maxHops })
-    Promise.all([
-      getJson<{ paths: SupplyPath[] }>(`/api/path${params}`),
-      getJson<{ mix: FuelMixRow[]; renewable_pct: number }>(`/api/mix${params}`),
-    ])
-      .then(([p, m]) => { if (!cancelled) { setPaths(p.paths); setMix(m) } })
-      .catch(err => { if (!cancelled) setFatal(err.message) })
-      .finally(() => { if (!cancelled) setLoadingDetail(false) })
-    return () => { cancelled = true }
-  }, [selectedLoad, trippedParam, maxHops, fatal])
+    const timer = setTimeout(() => {
+      Promise.all([
+        getJson<{ paths: SupplyPath[] }>(`/api/path${params}`, controller.signal),
+        getJson<{ mix: FuelMixRow[]; renewable_pct: number }>(`/api/mix${params}`, controller.signal),
+      ])
+        .then(([p, m]) => { setPaths(p.paths); setMix(m); clearNotice('detail') })
+        .catch(err => report('detail', err))
+        .finally(() => { if (!controller.signal.aborted) setLoadingDetail(false) })
+    }, BURST_MS)
+    return () => { clearTimeout(timer); controller.abort() }
+  }, [selectedLoad, trippedParam, maxHops, fatal, attempt, report, clearNotice])
 
   const toggleLine = useCallback((lineId: string) => {
     setTripped(prev =>
       prev.includes(lineId) ? prev.filter(id => id !== lineId) : [...prev, lineId],
     )
   }, [])
+
+  // One banner, whichever failed: two stacked messages for the same underlying
+  // "the instance is busy" would say the same thing twice.
+  const notice = notices.cont ?? notices.detail ?? null
 
   const trippedSet = useMemo(() => new Set(tripped), [tripped])
   const atRiskIds = useMemo(
@@ -200,6 +249,12 @@ export default function Home() {
       </div>
 
       <aside className="panel right stack">
+        {notice && (
+          <NoticeBanner
+            message={notice}
+            onRetry={() => { setNotices({}); setAttempt(n => n + 1) }}
+          />
+        )}
         <h2>Supply adequacy</h2>
         <AdequacyPanel
           atRisk={contingency?.at_risk ?? []}

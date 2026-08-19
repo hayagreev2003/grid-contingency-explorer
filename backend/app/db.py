@@ -1,12 +1,14 @@
 """Bolt driver lifecycle and the single read helper every query goes through."""
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Any
 
 from neo4j import AsyncDriver, AsyncGraphDatabase
 from neo4j.exceptions import (
     AuthError,
+    ClientError,
     ConfigurationError,
     Neo4jError,
     ServiceUnavailable,
@@ -17,6 +19,15 @@ from app.config import ConfigError, get_settings
 
 log = logging.getLogger("grid.db")
 
+# The driver's wording when the pool is drained and the acquisition timeout
+# expires. Matched on text because the driver gives it no distinguishing code.
+_POOL_EXHAUSTED = "failed to obtain a connection from the pool"
+
+#: Pause before the single retry of a statement the server gave up on. Long
+#: enough for the queries that crowded it out to finish, short enough that the
+#: request does not read as hung.
+_RETRY_DELAY = 1.5
+
 # One driver for the whole process. The driver is a connection pool, not a
 # connection: creating one per request would exhaust the free tier's 200
 # connection ceiling under very little load.
@@ -25,6 +36,19 @@ _driver: AsyncDriver | None = None
 
 class DatabaseUnreachable(RuntimeError):
     """The database is not there. Distinct from 'the query was wrong'."""
+
+
+class DatabaseBusy(RuntimeError):
+    """Every pooled connection was in use and none came free in time.
+
+    The driver reports this as ClientError, "failed to obtain a connection from
+    the pool within 10.0s (timeout)", but it is not a client mistake and not a
+    fault: it is backpressure. Each query holds its connection for seconds
+    against the free tier, so a burst of overlapping requests drains a pool of
+    ``COGNODB_MAX_POOL_SIZE`` and the ones behind it wait out the acquisition
+    timeout. It gets its own class so that answer is a 503 the UI can retry
+    rather than a 500 that reads like a bug.
+    """
 
 
 class QueryDeadlineExceeded(RuntimeError):
@@ -68,7 +92,7 @@ async def verify_connectivity() -> None:
         raise _as_unreachable(exc) from exc
 
 
-async def read_query(cypher: str, /, **params: Any) -> list[dict[str, Any]]:
+async def _run(cypher: str, /, **params: Any) -> list[dict[str, Any]]:
     """Run a read-only statement with bound parameters and return plain dicts.
 
     Every caller passes parameters as keyword arguments. There is no code path in
@@ -85,12 +109,38 @@ async def read_query(cypher: str, /, **params: Any) -> list[dict[str, Any]]:
     except (ServiceUnavailable, AuthError, ConfigurationError, OSError) as exc:
         raise _as_unreachable(exc) from exc
     except TransientError as exc:
-        if "OutOfTimeError" in str(exc.code or "") or "deadline" in str(exc):
+        if _is_deadline(exc):
             raise QueryDeadlineExceeded(str(exc)) from exc
+        raise
+    except ClientError as exc:
+        if _POOL_EXHAUSTED in str(exc):
+            raise DatabaseBusy(str(exc)) from exc
         raise
     except Neo4jError:
         # A real query error: surface it as a 500 and log the detail.
         raise
+
+
+async def read_query(cypher: str, /, **params: Any) -> list[dict[str, Any]]:
+    """``_run`` with one retry when the server abandons the statement.
+
+    The deadline is a load symptom rather than a property of the query: the same
+    statement that missed it answers in about two seconds when the instance is
+    not also serving four other traversals. One retry after a short pause turns
+    the common case -- a burst of overlapping requests -- into a slow answer
+    instead of an error. Exactly one, because a query that is genuinely too
+    expensive should fail rather than be paid for twice on every request.
+    """
+    try:
+        return await _run(cypher, **params)
+    except QueryDeadlineExceeded:
+        log.info("statement deadline exceeded, retrying once")
+        await asyncio.sleep(_RETRY_DELAY)
+        return await _run(cypher, **params)
+
+
+def _is_deadline(exc: Neo4jError) -> bool:
+    return "OutOfTimeError" in str(exc.code or "") or "deadline" in str(exc)
 
 
 def _as_unreachable(exc: Exception) -> Exception:
@@ -114,6 +164,7 @@ def _as_unreachable(exc: Exception) -> Exception:
 
 __all__ = [
     "ConfigError",
+    "DatabaseBusy",
     "DatabaseUnreachable",
     "QueryDeadlineExceeded",
     "close_driver",

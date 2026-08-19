@@ -34,6 +34,24 @@ export function ErrorBanner({ message, onRetry }: { message: string; onRetry: ()
   )
 }
 
+/**
+ * A failure the app can carry on around: the instance busy, or a query it could
+ * not finish in time. Distinct from ErrorBanner both in wording and in weight --
+ * the map and the outage set still work, so this sits above the panels it
+ * affected rather than replacing the page.
+ */
+export function NoticeBanner({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="banner notice" role="status">
+      <div style={{ flex: 1 }}>
+        <strong>Temporarily unavailable</strong>
+        <div className="small muted">{message}</div>
+      </div>
+      <button onClick={onRetry}>Retry</button>
+    </div>
+  )
+}
+
 export function AdequacyPanel({
   atRisk, islanded, shortfallMw, population, trippedCount, loading,
 }: {
