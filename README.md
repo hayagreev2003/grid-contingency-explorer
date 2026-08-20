@@ -14,18 +14,7 @@ services: the frontend on **Vercel**, the API on **Render**.
 | **Application** | <https://grid-contingency-explorer.vercel.app/> |
 | **API** | <https://grid-contigency-explorer.onrender.com/api/health> |
 | **Interactive API docs** | <https://grid-contigency-explorer.onrender.com/docs> |
-| **Screen recording** | _add the link here_ · shot list: [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) |
-
-The API runs on Render's free plan, which suspends a service after ~15 minutes
-of inactivity. **The first request after an idle period can take up to a
-minute** while the container starts; the UI says so rather than showing an
-unexplained spinner, and a scheduled workflow pings `/api/health` every ten
-minutes to keep it resident. Everything after the first request is fast.
-
-> One spelling trap, called out so nobody assumes a broken link: the Render
-> service is `grid-contigency-explorer` — missing an "n", a typo inherited from
-> the repository name — while the Vercel project is `grid-contingency-explorer`.
-> Both URLs above are correct as written.
+| **Screen Recording** | <https://drive.google.com/file/d/1tzb2futFzqSQY5TJZlomzr9ycPOQByM_/view> |
 
 The database is a live CognoDB `c0` instance and will be kept running.
 
